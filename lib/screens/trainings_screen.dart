@@ -86,7 +86,12 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
 
   void _updateValue(String key, int change) {
     setState(() {
-      int newValue = (int.parse(_controllers[key]!.text) + change).clamp(-50, 50);
+      int newValue;
+      if (key == "Spin") {
+        newValue = (int.parse(_controllers[key]!.text) + change).clamp(-50, 50);
+      } else {
+        newValue = (int.parse(_controllers[key]!.text) + change).clamp(0, 100);
+      }
       _controllers[key]!.text = newValue.toString();
     });
     _saveSettings(_currentTrainingIndex);
@@ -102,7 +107,12 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
 
   void _updateValueManually(String key, String value) {
     int? newValue = int.tryParse(value);
-    if (newValue != null && newValue >= -50 && newValue <= 50) {
+    if (newValue != null) {
+      if (key == "Spin") {
+        newValue = newValue.clamp(-50, 50);
+      } else {
+        newValue = newValue.clamp(0, 100);
+      }
       setState(() {
         _controllers[key]!.text = newValue.toString();
       });

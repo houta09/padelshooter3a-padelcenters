@@ -15,7 +15,7 @@
 
     <application
         android:label="padelshooter3a1"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/padelshooter_app">
 
         <!-- Add this line to enable embedding v2 -->
         <meta-data

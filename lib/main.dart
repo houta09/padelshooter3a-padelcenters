@@ -88,12 +88,14 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
   Widget _buildPage(Widget page) {
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          alignment: Alignment.center,
-          child: Text(
-            _getPageTitle(),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+        SafeArea(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            alignment: Alignment.center,
+            child: Text(
+              _getPageTitle(),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
           ),
         ),
         Expanded(child: page),
