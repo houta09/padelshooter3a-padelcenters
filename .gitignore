@@ -42,3 +42,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 Padelshooter3a1-app/
+.DS_Store
+._*
+build/
+*.lock
+.metadata
+pubspec.lock
