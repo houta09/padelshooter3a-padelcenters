@@ -210,7 +210,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
   Widget _buildCommandButtons() {
     return GridView.count(
       crossAxisCount: 3,
-      childAspectRatio: 2.0,
+      childAspectRatio: 1.8,
       padding: const EdgeInsets.all(2),
       mainAxisSpacing: 5,
       crossAxisSpacing: 1,
