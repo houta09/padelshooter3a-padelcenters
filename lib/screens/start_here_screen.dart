@@ -146,27 +146,30 @@ class _StartHereScreenState extends State<StartHereScreen> {
         return Scaffold(
           body: Stack(
             children: [
-              Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/background_app.jpg"),
-                    fit: BoxFit.cover,
-                  ),
+              Positioned.fill(
+                child: Image.asset(
+                  "assets/images/background_app.jpg",
+                  fit: BoxFit.cover,
                 ),
               ),
-              SingleChildScrollView(
-                child: Visibility(
-                  visible: bluetoothManager.isConnected,
-                  replacement: const Center(child: CircularProgressIndicator()),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _buildCommandButtons(),
-                      _buildFieldSelectionButtons(),
-                      _buildValueControls(),
-                      _buildControlButtons(bluetoothManager),
-                    ],
-                  ),
+              SafeArea(
+                child: Column(
+                  children: [
+//                    SizedBox(height: 50), // Add extra space above
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            _buildCommandButtons(),
+                            _buildFieldSelectionButtons(),
+                            _buildValueControls(),
+                            _buildControlButtons(bluetoothManager),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -179,7 +182,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
   Widget _buildCommandButtons() {
     return GridView.count(
       crossAxisCount: 3,
-      childAspectRatio: 2.2,
+      childAspectRatio: 2.0,
       padding: const EdgeInsets.all(2),
       mainAxisSpacing: 10,
       crossAxisSpacing: 1,
@@ -233,13 +236,13 @@ class _StartHereScreenState extends State<StartHereScreen> {
 
   Widget _buildFieldSelectionButtons() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 3.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildFieldButton("Left", _leftSelected, () => _updateFieldSelection("left")),
           const SizedBox(width: 6),
-          const Text("Side", style: TextStyle(fontSize: 14, color: Colors.white)),
+          const Text("Side", style: TextStyle(fontSize: 10, color: Colors.white)),
           const SizedBox(width: 6),
           _buildFieldButton("Right", _rightSelected, () => _updateFieldSelection("right")),
         ],
@@ -262,7 +265,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
             controller: _controllers[key],
             keyboardType: TextInputType.numberWithOptions(signed: true),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
             decoration: const InputDecoration(
               border: InputBorder.none,
             ),
@@ -278,7 +281,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 20), // Adjusted padding
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         backgroundColor: isSelected ? Colors.blue : Colors.grey[600]!,
         foregroundColor: Colors.white,
@@ -293,14 +296,14 @@ class _StartHereScreenState extends State<StartHereScreen> {
     return ElevatedButton(
       onPressed: bluetoothManager.isConnected ? onPressed : null,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 6),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         backgroundColor: bgColor,
         foregroundColor: Colors.white,
       ),
       child: FittedBox(
         fit: BoxFit.scaleDown,
-        child: Text(label, style: const TextStyle(fontSize: 16)),
+        child: Text(label, style: const TextStyle(fontSize: 12)),
       ),
     );
   }
@@ -373,7 +376,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
                   controller: _controllers[key],
                   keyboardType: key == "Spin" ? TextInputType.numberWithOptions(signed: true) : TextInputType.number,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                   ),

@@ -135,24 +135,39 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.transparent,  // Make the background transparent
-          type: BottomNavigationBarType.fixed,  // Ensure the bar doesn't move
+          backgroundColor: Colors.transparent,
+          type: BottomNavigationBarType.fixed,
           items: [
-            const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Main'),
-            const BottomNavigationBarItem(icon: Icon(Icons.location_on), label: 'Start Here'),
-            const BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: 'Trainings'),
-            const BottomNavigationBarItem(icon: Icon(Icons.computer), label: 'Programs'),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.home, size: 25),
+              label: 'Main',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.location_on, size: 25),
+              label: 'Start Here',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.fitness_center, size: 25),
+              label: 'Trainings',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.computer, size: 25),
+              label: 'Programs',
+            ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.bluetooth,
                 color: isConnected ? Colors.green : Colors.red,
+                size: 25,
               ),
-              label: 'Bluetooth',
+              label: 'BT',
             ),
           ],
           currentIndex: _currentPageIndex,
           selectedItemColor: Colors.white,
           unselectedItemColor: Colors.white60,
+          selectedLabelStyle: const TextStyle(fontSize: 13),
+          unselectedLabelStyle: const TextStyle(fontSize: 12),
           onTap: (index) {
             if (index != 4) {
               changePage(index);

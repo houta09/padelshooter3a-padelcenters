@@ -116,8 +116,22 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       setState(() {
         _controllers[key]!.text = newValue.toString();
       });
-      _saveSettings(_currentTrainingIndex);
+      if (key == "Left %" || key == "Right %") {
+        _validateAndCorrectPercentages();
+      } else {
+        _saveSettings(_currentTrainingIndex);
+      }
     }
+  }
+
+  void _validateAndCorrectPercentages() {
+    int leftPercent = int.parse(_controllers["Left %"]!.text);
+    int rightPercent = int.parse(_controllers["Right %"]!.text);
+    if (rightPercent < leftPercent) {
+      rightPercent = leftPercent;
+      _controllers["Right %"]!.text = rightPercent.toString();
+    }
+    _saveSettings(_currentTrainingIndex);
   }
 
   void _updateFieldSelection(String side) {
@@ -159,28 +173,31 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
         return Scaffold(
           body: Stack(
             children: [
-              Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/background_app.jpg"),
-                    fit: BoxFit.cover,
-                  ),
+              Positioned.fill(
+                child: Image.asset(
+                  "assets/images/background_app.jpg",
+                  fit: BoxFit.cover,
                 ),
               ),
-              SingleChildScrollView(
-                child: Visibility(
-                  visible: bluetoothManager.isConnected,
-                  replacement: const Center(child: CircularProgressIndicator()),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _buildCommandButtons(),
-                      _buildFieldSelectionButtons(),
-                      _buildFieldPercentControls(),
-                      _buildValueControls(),
-                      _buildControlButtons(bluetoothManager),
-                    ],
-                  ),
+              SafeArea(
+                child: Column(
+                  children: [
+//                    SizedBox(height: 50), // Add extra space above
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            _buildCommandButtons(),
+                            _buildFieldSelectionButtons(),
+                            _buildFieldPercentControls(),
+                            _buildValueControls(),
+                            _buildControlButtons(bluetoothManager),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -193,9 +210,9 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
   Widget _buildCommandButtons() {
     return GridView.count(
       crossAxisCount: 3,
-      childAspectRatio: 2.2,
+      childAspectRatio: 2.0,
       padding: const EdgeInsets.all(2),
-      mainAxisSpacing: 10,
+      mainAxisSpacing: 5,
       crossAxisSpacing: 1,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -247,13 +264,13 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
 
   Widget _buildFieldSelectionButtons() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 3.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildFieldButton("Left", _leftSelected, () => _updateFieldSelection("left")),
           const SizedBox(width: 6),
-          const Text("Side", style: TextStyle(fontSize: 14, color: Colors.white)),
+          const Text("Side", style: TextStyle(fontSize: 10, color: Colors.white)),
           const SizedBox(width: 6),
           _buildFieldButton("Right", _rightSelected, () => _updateFieldSelection("right")),
         ],
@@ -289,12 +306,11 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
             controller: _controllers[key],
             keyboardType: TextInputType.numberWithOptions(signed: true),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
             decoration: const InputDecoration(
               border: InputBorder.none,
             ),
             onSubmitted: (value) => _updateValueManually(key, value),
-            enabled: !_leftSelected && !_rightSelected,
           ),
         ),
       ],
@@ -305,7 +321,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 20), // Adjusted padding
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         backgroundColor: isSelected ? Colors.blue : Colors.grey[600]!,
         foregroundColor: Colors.white,
@@ -320,14 +336,14 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
     return ElevatedButton(
       onPressed: bluetoothManager.isConnected ? onPressed : null,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 6),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         backgroundColor: bgColor,
         foregroundColor: Colors.white,
       ),
       child: FittedBox(
         fit: BoxFit.scaleDown,
-        child: Text(label, style: const TextStyle(fontSize: 16)),
+        child: Text(label, style: const TextStyle(fontSize: 12)),
       ),
     );
   }
@@ -375,7 +391,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
             children: [
               Text(
                 key,
-                style: const TextStyle(fontSize: 12, color: Colors.white),
+                style: const TextStyle(fontSize: 10, color: Colors.white),
               ),
               Container(
                 decoration: const BoxDecoration(
@@ -403,7 +419,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                   controller: _controllers[key],
                   keyboardType: key == "Spin" ? TextInputType.numberWithOptions(signed: true) : TextInputType.number,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                   ),
