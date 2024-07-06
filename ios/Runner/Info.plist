@@ -36,11 +36,8 @@
     <array>
         <string>UIInterfaceOrientationPortrait</string>
         <string>UIInterfaceOrientationPortraitUpsideDown</string>
-    </array>
-    <key>UISupportedInterfaceOrientations~ipad</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
     <key>CFBundleIcons</key>
     <dict>
@@ -80,5 +77,20 @@
     <string>Your app needs location access to detect Bluetooth devices in the background.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Your app needs location access to detect Bluetooth devices while the app is in use.</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>en</string>
+        <string>es</string>
+        <string>fr</string>
+        <string>zh</string>
+        <string>de</string>
+        <string>pt</string>
+        <string>it</string>
+        <string>sv</string>
+        <string>fi</string>
+        <string>pl</string>
+        <string>ja</string>
+        <string>ar</string>
+    </array>
 </dict>
 </plist>
