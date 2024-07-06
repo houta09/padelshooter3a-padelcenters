@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/app_localizations.dart';
 import '../utils/bluetooth_manager.dart';
+import '../main.dart';
 
 class ProgramsScreen extends StatefulWidget {
   final Function(int) onNavigate;
@@ -80,6 +82,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       prefs.setInt("${_selectedCategory!}_${_programNameController.text}_Height_$i", int.parse(_shots[i]["Height"]!.text));
     }
     prefs.setInt("${_selectedCategory!}_${_programNameController.text}_ShotCount", _currentShotCount);
+    print('*AVH: Program saved: ${_programNameController.text}');
   }
 
   Future<void> _loadProgram(String programName) async {
@@ -97,6 +100,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       _shots[i]["Width"]!.text = (prefs.getInt("${_selectedCategory!}_${programName}_Width_$i") ?? 0).toString();
       _shots[i]["Height"]!.text = (prefs.getInt("${_selectedCategory!}_${programName}_Height_$i") ?? 0).toString();
     }
+    print('*AVH: Program loaded: $programName');
   }
 
   Future<void> _deleteProgram(String programName) async {
@@ -114,6 +118,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       await prefs.remove("${_selectedCategory!}_${programName}_Height_$i");
     }
     await prefs.remove("${_selectedCategory!}_${programName}_ShotCount");
+    print('*AVH: Program deleted: $programName');
   }
 
   Future<void> _playProgram() async {
@@ -131,6 +136,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       }
     }
     await _bluetoothManager?.sendProgramToPadelshooter(program);
+    print('*AVH: Program played: ${_programNameController.text}');
   }
 
   void _addShot() {
@@ -149,6 +155,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         setState(() {
           _currentShotCount++;
         });
+        print('*AVH: Shot added');
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -164,6 +171,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         _currentShotCount--;
         _selectedShotIndex = -1; // Reset selection
       });
+      print('*AVH: Shot deleted at index: $_selectedShotIndex');
     }
   }
 
@@ -179,6 +187,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         });
         _currentShotCount++;
       });
+      print('*AVH: Shot copied at index: $_selectedShotIndex');
     }
   }
 
@@ -189,6 +198,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         _shots.insert(_selectedShotIndex - 1, shot);
         _selectedShotIndex--;
       });
+      print('*AVH: Shot moved up at index: $_selectedShotIndex');
     }
   }
 
@@ -199,6 +209,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         _shots.insert(_selectedShotIndex + 1, shot);
         _selectedShotIndex++;
       });
+      print('*AVH: Shot moved down at index: $_selectedShotIndex');
     }
   }
 
@@ -269,6 +280,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       setState(() {
         _selectedCategory = category;
       });
+      print('*AVH: Category selected: $_selectedCategory');
     }
   }
 
@@ -367,9 +379,9 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                   TextField(
                     controller: _programNameController,
                     style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      labelText: 'Program Name',
-                      labelStyle: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)?.translate('pn') ?? 'Program Name',
+                      labelStyle: const TextStyle(color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -386,7 +398,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                       backgroundColor: _isCategoryButtonPressed ? Colors.blue : Colors.grey[700],
                       fixedSize: const Size(150, 40),
                     ),
-                    child: Text(_selectedCategory ?? 'Category'),
+                    child: Text(_selectedCategory ?? (AppLocalizations.of(context)?.translate('cat') ?? 'Category')),
                   ),
                   const SizedBox(height: 20),
                   ...List.generate(_currentShotCount, (index) {
@@ -406,13 +418,53 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                 },
                               ),
                             ),
-                            Text('Shot ${index + 1}', style: const TextStyle(color: Colors.white, fontSize: 14)),
+                            Text('${AppLocalizations.of(context)?.translate('shot') ?? 'Shot'} ${index + 1}', style: const TextStyle(color: Colors.white, fontSize: 14)),
                             const SizedBox(width: 10),
-                            _buildValueControl("Speed", index),
-                            _buildValueControl("Spin", index),
-                            _buildValueControl("Freq", index),
-                            _buildValueControl("Width", index),
-                            _buildValueControl("Height", index),
+                            ..._shots[index].keys.map((key) {
+                              return Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  child: Column(
+                                    children: [
+                                      Text(AppLocalizations.of(context)?.translate(key.toLowerCase()) ?? key, style: const TextStyle(color: Colors.white, fontSize: 10)),
+                                      SizedBox(
+                                        width: 50,
+                                        height: 30,
+                                        child: TextField(
+                                          controller: _shots[index][key],
+                                          keyboardType: key == "Spin" ? TextInputType.numberWithOptions(signed: true) : TextInputType.number,
+                                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                                          decoration: const InputDecoration(
+                                            contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                                            border: OutlineInputBorder(),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.white),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.white),
+                                            ),
+                                          ),
+                                          onSubmitted: (value) {
+                                            if (key == "Spin") {
+                                              int? newValue = int.tryParse(value);
+                                              if (newValue != null) {
+                                                newValue = newValue.clamp(-50, 50);
+                                                setState(() {
+                                                  _shots[index][key]!.text = newValue.toString();
+                                                });
+                                              }
+                                            } else {
+                                              // _saveSettings(index); // Removed this call
+                                            }
+                                            print('*AVH: Shot value updated for $key: $value');
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ],
                         ),
                         const Divider(color: Colors.white),
@@ -428,7 +480,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Add Shot'),
+                        child: Text(AppLocalizations.of(context)?.translate('as') ?? 'Add Shot'),
                       ),
                     ),
                   const SizedBox(height: 20),
@@ -448,7 +500,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _isSaveButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Save Program', style: TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('savep') ?? 'Save Program', style: const TextStyle(fontSize: 12)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -463,7 +515,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _isLoadButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Load Program', style: TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('loadp') ?? 'Load Program', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),
@@ -484,7 +536,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _isPlayButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Play Program', style: TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('playprog') ?? 'Play Program', style: const TextStyle(fontSize: 12)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -493,13 +545,14 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                             _isOffButtonPressed = true;
                           });
                           _bluetoothManager?.sendCommandToPadelshooter(command: 0);
+                          print('*AVH: Bluetooth command sent: Off');
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
                           backgroundColor: _isOffButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Off', style: TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('off') ?? 'Off', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),
@@ -520,7 +573,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _selectedShotIndex != -1 && _isDeleteShotButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Delete Shot', style: TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('delshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
+
                       ),
                       ElevatedButton(
                         onPressed: _selectedShotIndex != -1 ? () {
@@ -535,7 +589,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _selectedShotIndex != -1 && _isCopyShotButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Copy Shot', style: TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('copyshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
+
                       ),
                     ],
                   ),
@@ -556,7 +611,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _selectedShotIndex > 0 && _isMoveUpButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Move Up', style: TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('mu') ?? 'Move Up', style: const TextStyle(fontSize: 12)),
                       ),
                       ElevatedButton(
                         onPressed: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 ? () {
@@ -571,43 +626,11 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 && _isMoveDownButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Move Down', style: TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('md') ?? 'Move Down', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),
                 ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildValueControl(String label, int index) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: Column(
-          children: [
-            Text(label, style: const TextStyle(color: Colors.white, fontSize: 10)),
-            SizedBox(
-              width: 50,
-              height: 30,
-              child: TextField(
-                controller: _shots[index][label],
-                keyboardType: TextInputType.numberWithOptions(signed: label == "Spin"),
-                style: const TextStyle(color: Colors.white, fontSize: 10),
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                  border: OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                ),
               ),
             ),
           ],

@@ -32,12 +32,14 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.18.0
-  flutter_blue_plus: ^1.32.5
+  flutter_blue_plus: ^1.32.8
   get: ^4.6.6
   permission_handler: ^11.3.1
   provider: ^6.1.2
-  shared_preferences: ^2.0.6
-
+  shared_preferences: ^2.2.3
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -45,6 +47,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  intl_translation: ^0.20.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -70,6 +73,18 @@ flutter:
   #   - images/a_dot_ham.jpeg
 
   assets:
+    - assets/lang/en.json
+    - assets/lang/de.json
+    - assets/lang/pt.json
+    - assets/lang/it.json
+    - assets/lang/sv.json
+    - assets/lang/fi.json
+    - assets/lang/es.json
+    - assets/lang/fr.json
+    - assets/lang/zh.json
+    - assets/lang/ja.json
+    - assets/lang/pl.json
+    - assets/lang/ar.json
     - assets/images/bluetooth-icon.png
     - assets/images/bluetooth-icon-greenbg.png
     - assets/images/Padelbaan_full_2-line.png
@@ -117,16 +132,6 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
 
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:

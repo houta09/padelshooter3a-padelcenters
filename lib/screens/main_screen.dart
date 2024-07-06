@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/bluetooth_manager.dart';
+import '../utils/app_localizations.dart';
 
 class MainScreen extends StatelessWidget {
   final Function(int) onNavigate;
 
-  const MainScreen({super.key, required this.onNavigate});
+  const MainScreen({Key? key, required this.onNavigate}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +29,16 @@ class MainScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 if (bluetoothManager.isConnected) ...[
-                  const Text(
-                    "Connected to Padelshooter",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  Text(
+                    AppLocalizations.of(context)?.translate('connected_to_padelshooter') ?? "Connected to Padelshooter",
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ] else ...[
                   const CircularProgressIndicator(),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Trying to connect to Padelshooter...",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  Text(
+                    AppLocalizations.of(context)?.translate('trying_to_connect_to_padelshooter') ?? "Trying to connect to Padelshooter...",
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ],
               ],

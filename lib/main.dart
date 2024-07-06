@@ -1,35 +1,126 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/main_screen.dart';
 import 'screens/start_here_screen.dart';
 import 'screens/trainings_screen.dart';
 import 'screens/programs_screen.dart';
+import 'screens/settings_screen.dart';
 import 'utils/bluetooth_manager.dart';
+import 'utils/app_localizations.dart';
 
-void main() {
+Future<void> clearArabicLanguagePreference() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (prefs.getString('language_code') == 'ar') {
+    await prefs.remove('language_code');
+  }
+}
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await clearArabicLanguagePreference();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) {
+      .then((_) async {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky); // Full-screen mode
-    runApp(const PadelShooterApp());
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? languageCode = prefs.getString('language_code');
+
+    // Set default to English if not set or not supported
+    if (languageCode == null || ![
+      'en', 'es', 'fr', 'zh', 'pt', 'pl', 'fi', 'sv', 'it', 'de', 'ja', 'ar'
+    ].contains(languageCode)) {
+      languageCode = 'en';
+    }
+
+    print('*AVH-lang-m: Initial language code from preferences: $languageCode');
+    runApp(PadelShooterApp(initialLocale: Locale(languageCode)));
   });
 }
 
-class PadelShooterApp extends StatelessWidget {
-  const PadelShooterApp({super.key});
+class PadelShooterApp extends StatefulWidget {
+  final Locale initialLocale;
+
+  const PadelShooterApp({super.key, required this.initialLocale});
+
+  @override
+  _PadelShooterAppState createState() => _PadelShooterAppState();
+
+  static void setLocale(BuildContext context, Locale newLocale) {
+    final _PadelShooterAppState? state = context.findAncestorStateOfType<_PadelShooterAppState>();
+    state?.setLocale(newLocale);
+  }
+}
+
+class _PadelShooterAppState extends State<PadelShooterApp> {
+  late Locale _locale;
+
+  @override
+  void initState() {
+    super.initState();
+    _locale = widget.initialLocale;
+    print('*AVH-main: Initial locale set to: ${_locale.languageCode}');
+  }
+
+  void setLocale(Locale locale) async {
+    setState(() {
+      _locale = locale;
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('language_code', locale.languageCode);
+    print('*AVH-lang-m: Locale set to: ${locale.languageCode}');
+  }
 
   @override
   Widget build(BuildContext context) {
+    print('*AVH-lang-m: Building app with locale: ${_locale.languageCode}');
     return ChangeNotifierProvider<BluetoothManager>(
       create: (_) => BluetoothManager()..initialize(),
       child: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
         },
-        child: const MaterialApp(
+        child: MaterialApp(
           title: 'Padelshooter',
-          home: DynamicContentFrame(),
+          home: const DynamicContentFrame(),
+          locale: _locale,
+          supportedLocales: const [
+            Locale('en', ''), // English
+            Locale('es', ''), // Spanish
+            Locale('fr', ''), // French
+            Locale('zh', ''), // Chinese
+            Locale('de', ''), // German
+            Locale('pt', ''), // Portuguese
+            Locale('it', ''), // Italian
+            Locale('sv', ''), // Swedish
+            Locale('fi', ''), // Finnish
+            Locale('pl', ''), // Polish
+            Locale('ja', ''), // Japanese
+            Locale('ar', ''), // Arabic
+          ],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          localeResolutionCallback: (locale, supportedLocales) {
+            print('*AVH-lang-m: localeResolutionCallback: device locale=${locale?.languageCode}');
+            for (var supportedLocale in supportedLocales) {
+              if (supportedLocale.languageCode == _locale.languageCode &&
+                  supportedLocale.countryCode == _locale.countryCode) {
+                return supportedLocale;
+              }
+            }
+            return _locale;
+          },
+          builder: (context, child) {
+            return Directionality(
+              textDirection: _locale.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+              child: child!,
+            );
+          },
         ),
       ),
     );
@@ -49,13 +140,13 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
   @override
   void initState() {
     super.initState();
-    var bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
+    final bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
     bluetoothManager.addListener(_updateConnectionStatus);
   }
 
   @override
   void dispose() {
-    var bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
+    final bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
     bluetoothManager.removeListener(_updateConnectionStatus);
     super.dispose();
   }
@@ -68,18 +159,21 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
     setState(() {
       _currentPageIndex = index;
     });
+    print('*AVH: Page changed to index: $index');
   }
 
   String _getPageTitle() {
     switch (_currentPageIndex) {
       case 0:
-        return 'Main';
+        return AppLocalizations.of(context)?.translate('main') ?? 'Main';
       case 1:
-        return 'Start Here';
+        return AppLocalizations.of(context)?.translate('start_here') ?? 'Start Here';
       case 2:
-        return 'Trainings';
+        return AppLocalizations.of(context)?.translate('trainings') ?? 'Trainings';
       case 3:
-        return 'Programs';
+        return AppLocalizations.of(context)?.translate('programs') ?? 'Programs';
+      case 4:
+        return AppLocalizations.of(context)?.translate('settings') ?? 'Settings';
       default:
         return '';
     }
@@ -105,8 +199,18 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
 
   @override
   Widget build(BuildContext context) {
-    var bluetoothManager = Provider.of<BluetoothManager>(context);
-    bool isConnected = bluetoothManager.isConnected;
+    final bluetoothManager = Provider.of<BluetoothManager>(context);
+    final bool isConnected = bluetoothManager.isConnected;
+
+    print('*AVH-lang-m: Building DynamicContentFrame with page index: $_currentPageIndex');
+
+    final String mainLabel = AppLocalizations.of(context)?.translate('main') ?? 'Main';
+    final String startHereLabel = AppLocalizations.of(context)?.translate('start_here') ?? 'Start Here';
+    final String trainingsLabel = AppLocalizations.of(context)?.translate('trainings') ?? 'Trainings';
+    final String programsLabel = AppLocalizations.of(context)?.translate('programs') ?? 'Programs';
+    final String settingsLabel = AppLocalizations.of(context)?.translate('settings') ?? 'Settings';
+
+    print('*AVH-lang-m: Translations - Main: $mainLabel, Start Here: $startHereLabel, Trainings: $trainingsLabel, Programs: $programsLabel, Settings: $settingsLabel');
 
     return GestureDetector(
       onTap: () {
@@ -130,6 +234,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
                 _buildPage(StartHereScreen(onNavigate: changePage)),
                 _buildPage(TrainingsScreen(onNavigate: changePage)),
                 _buildPage(ProgramsScreen(onNavigate: changePage)),
+                _buildPage(SettingsScreen(onNavigate: changePage)),
               ],
             ),
           ],
@@ -138,21 +243,25 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
           backgroundColor: Colors.transparent,
           type: BottomNavigationBarType.fixed,
           items: [
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.home, size: 25),
-              label: 'Main',
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home, size: 25),
+              label: mainLabel,
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.location_on, size: 25),
-              label: 'Start Here',
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.location_on, size: 25),
+              label: startHereLabel,
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.fitness_center, size: 25),
-              label: 'Trainings',
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.fitness_center, size: 25),
+              label: trainingsLabel,
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.computer, size: 25),
-              label: 'Programs',
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.computer, size: 25),
+              label: programsLabel,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.settings, size: 25),
+              label: settingsLabel,
             ),
             BottomNavigationBarItem(
               icon: Icon(
@@ -169,9 +278,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
           selectedLabelStyle: const TextStyle(fontSize: 13),
           unselectedLabelStyle: const TextStyle(fontSize: 12),
           onTap: (index) {
-            if (index != 4) {
-              changePage(index);
-            }
+            changePage(index);
           },
         ),
       ),

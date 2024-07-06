@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/bluetooth_manager.dart';
+import '../utils/app_localizations.dart';
 
 class TrainingsScreen extends StatefulWidget {
   final Function(int) onNavigate;
@@ -49,6 +50,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
   void initState() {
     super.initState();
     _loadSettings(_currentTrainingIndex);
+    print('*AVH: TrainingsScreen initialized with training index: $_currentTrainingIndex');
   }
 
   Future<void> _loadSettings(int trainingIndex) async {
@@ -67,6 +69,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       _rightSelected = prefs.getBool("RightSelected_$trainingIndex") ?? false;
     });
     _updateFieldPercentValues();
+    print('*AVH: Loaded settings for training index: $trainingIndex');
   }
 
   Future<void> _saveSettings(int trainingIndex) async {
@@ -82,6 +85,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
     await prefs.setInt("Right%_$trainingIndex", int.parse(_controllers["Right %"]!.text));
     await prefs.setBool("LeftSelected_$trainingIndex", _leftSelected);
     await prefs.setBool("RightSelected_$trainingIndex", _rightSelected);
+    print('*AVH: Saved settings for training index: $trainingIndex');
   }
 
   void _updateValue(String key, int change) {
@@ -95,6 +99,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       _controllers[key]!.text = newValue.toString();
     });
     _saveSettings(_currentTrainingIndex);
+    print('*AVH: Updated $key to new value: ${_controllers[key]!.text}');
   }
 
   void _updateTrainingValue(int index) {
@@ -103,6 +108,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       _currentTrainingIndex = index;
     });
     _loadSettings(index);
+    print('*AVH: Training value updated to index: $index');
   }
 
   void _updateValueManually(String key, String value) {
@@ -121,6 +127,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       } else {
         _saveSettings(_currentTrainingIndex);
       }
+      print('*AVH: Manually updated $key to new value: $newValue');
     }
   }
 
@@ -132,6 +139,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       _controllers["Right %"]!.text = rightPercent.toString();
     }
     _saveSettings(_currentTrainingIndex);
+    print('*AVH: Validated and corrected percentages');
   }
 
   void _updateFieldSelection(String side) {
@@ -144,6 +152,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       _updateFieldPercentValues();
     });
     _saveSettings(_currentTrainingIndex);
+    print('*AVH: Field selection updated: $side');
   }
 
   void _updateFieldPercentValues() {
@@ -157,6 +166,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       _controllers["Left %"]?.text = '50';
       _controllers["Right %"]?.text = '100';
     }
+    print('*AVH: Field percent values updated');
   }
 
   Map<String, int> _getFieldValues() {
@@ -182,7 +192,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
               SafeArea(
                 child: Column(
                   children: [
-//                    SizedBox(height: 50), // Add extra space above
+                    // SizedBox(height: 50), // Add extra space above
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
@@ -226,14 +236,15 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildButton(context, "Off", 0, bluetoothManager, () {
+          _buildButton(context, AppLocalizations.of(context)?.translate('off') ?? 'Off', 0, bluetoothManager, () {
             setState(() {
               _activeButton = 0;
               _isPlayActive = false;
               bluetoothManager.sendCommandToPadelshooter(command: 0);
             });
+            print('*AVH: Off button pressed');
           }),
-          _buildButton(context, "Play", 1, bluetoothManager, () {
+          _buildButton(context, AppLocalizations.of(context)?.translate('play') ?? 'Play', 1, bluetoothManager, () {
             setState(() {
               _isPlayActive = true;
             });
@@ -256,6 +267,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
               generalInfo: 1,
               endByte: 255,
             );
+            print('*AVH: Play button pressed with settings: ${_controllers["Speed"]!.text}, ${_controllers["Spin"]!.text}, ${_controllers["Freq"]!.text}');
           }),
         ],
       ),
@@ -268,11 +280,11 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildFieldButton("Left", _leftSelected, () => _updateFieldSelection("left")),
+          _buildFieldButton(AppLocalizations.of(context)?.translate('left') ?? 'Left', _leftSelected, () => _updateFieldSelection("left")),
           const SizedBox(width: 6),
-          const Text("Side", style: TextStyle(fontSize: 10, color: Colors.white)),
+          Text(AppLocalizations.of(context)?.translate('side') ?? 'Side', style: const TextStyle(fontSize: 10, color: Colors.white)),
           const SizedBox(width: 6),
-          _buildFieldButton("Right", _rightSelected, () => _updateFieldSelection("right")),
+          _buildFieldButton(AppLocalizations.of(context)?.translate('right') ?? 'Right', _rightSelected, () => _updateFieldSelection("right")),
         ],
       ),
     );
@@ -284,8 +296,8 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildFieldPercentControl("Left %"),
-          _buildFieldPercentControl("Right %"),
+          _buildFieldPercentControl(AppLocalizations.of(context)?.translate('left_percent') ?? 'Left %'),
+          _buildFieldPercentControl(AppLocalizations.of(context)?.translate('right_percent') ?? 'Right %'),
         ],
       ),
     );
@@ -360,6 +372,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
           _activeButton = index;
           _updateTrainingValue(index);
         });
+        print('*AVH: Actionable button pressed for label: $label');
       },
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.zero,
@@ -390,7 +403,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                key,
+                AppLocalizations.of(context)?.translate(key.toLowerCase()) ?? key,
                 style: const TextStyle(fontSize: 10, color: Colors.white),
               ),
               Container(
