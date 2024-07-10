@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:collection/collection.dart';
@@ -91,7 +90,7 @@ class BluetoothManager extends ChangeNotifier {
     await completer.future.catchError((_) {});
     FlutterBluePlus.stopScan();
     isScanning = false;
-    scanSubscription?.cancel();
+    scanSubscription.cancel();
 
     if (!isConnected) {
       print("Device not found, starting reconnection loop...");
@@ -145,7 +144,7 @@ class BluetoothManager extends ChangeNotifier {
     if (service == null || characteristic == null) {
       throw Exception("Service or Characteristic not found");
     }
-    await characteristic!.write(Uint8List.fromList(data), withoutResponse: false);
+    await characteristic.write(Uint8List.fromList(data), withoutResponse: false);
   }
 
   Future<void> sendCommandToPadelshooter({

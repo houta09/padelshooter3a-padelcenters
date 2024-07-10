@@ -30,9 +30,11 @@
   "german": "Tedesco",
   "portuguese": "Portoghese",
   "swedish": "Svedese",
+  "latvia": "Lettonia",
   "italian": "Italiano",
   "finnish": "Finlandese",
   "arabic": "Arabo",
+  "dutch": "Olandese",
   "main": "Principale",
   "start_here": "Inizia Qui",
   "trainings": "Allenamenti",
@@ -51,5 +53,8 @@
   "delshot": "Elimina Tiro",
   "copyshot": "Copia Tiro",
   "mu": "Sposta Su",
-  "md": "Sposta Giù"
+  "md": "Sposta Giù",
+  "export": "Esporta",
+  "import": "Importa",
+  "help-info": "Per il Padelshooter ci sono 3 schermi:\n\nInizia qui:\nPer iniziare immediatamente con la macchina e facile da usare. La maggior parte degli allenamenti è di un tipo di colpi in una posizione con alcune variazioni. Questo è il modo più semplice per imparare a usare la velocità, lo spin, la frequenza, la larghezza, l'altezza e la rete.\n\nAllenamenti:\nCombinazioni di colpi come bandeja - allenamenti di volée. L'altezza della volée è impostata con \"Rete\", l'altezza della bandeja con \"Altezza\". La bandeja ha bisogno di più tempo per arrivare al giocatore, quindi una pausa extra può essere impostata con \"Ritardo\".\n\nProgrammi:\nCrea i tuoi allenamenti / programmi. I programmi dovrebbero essere aggiunti a una categoria come \"Principiante\", \"Avanzato\" o \"Tipo di colpo\" o \"1 giocatore\", \"2 giocatori\".\n\nLa macchina è normalmente posizionata al centro orizzontale vicino al vetro posteriore. Ma per l'allenamento di palle di vetro posteriori e laterali nell'angolo, è anche utile posizionare la macchina nell'angolo opposto.\nL'idea di base di Padelshooter è di impostare le preferenze per velocità, spin, frequenza, larghezza e altezza. Quando si utilizza l'app per la prima volta, queste hanno impostazioni standard e dovrebbero essere modificate una volta e ricordate per ogni allenamento successivo.\nPer alcuni allenamenti la \"rete\" è utile, le palline non passano sotto questa altezza della rete. In questo modo puoi impostare negli allenamenti di altezza casuale la posizione più bassa possibile con \"Rete\", indipendentemente dalla bassa velocità. Per allenarsi sul lato sinistro o destro del campo, è possibile selezionare premendo quel pulsante o entrambi per l'intero campo. Nella schermata degli allenamenti, puoi rendere l'area orizzontale ancora più piccola selezionando una % dove lo 0% è più a sinistra e il 100% è più a destra (visto dal giocatore).\n\nSe hai un problema, visita il nostro sito web \n\nhttps://padelshooter.com/ \nNella sezione download per il Padelshooter 3A, ci sono informazioni utili per trovare/risolvere i problemi.\nPer assistenza e supporto, puoi contattarci (preferibilmente tramite whatsapp inviando un video) a:\n\nDe Racketclub\nT: 31-630974299 (anche whatsapp)\n\nOppure contatta il tuo distributore."
 }

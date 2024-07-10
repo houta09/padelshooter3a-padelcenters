@@ -34,10 +34,9 @@ class AppLocalizations {
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
-  @override
   bool isSupported(Locale locale) {
     return [
-      'en', 'es', 'fr', 'zh', 'pt', 'pl', 'fi', 'sv', 'it', 'de', 'ja', 'ar'
+      'en', 'es', 'fr', 'zh', 'pt', 'pl', 'fi', 'sv', 'it', 'de', 'ja', 'ar', 'lv'
     ].contains(locale.languageCode);
   }
 

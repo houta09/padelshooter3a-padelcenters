@@ -26,12 +26,14 @@
   "chinese": "Chinese",
   "japanese": "Japanese",
   "polish": "Polish",
+  "latvia": "Latvia",
   "german": "German",
   "portuguese": "Portuguese",
   "swedish": "Swedish",
   "italian": "Italian",
   "finnish": "Finnish",
   "arabic": "Arabic",
+  "dutch": "Dutch",
   "main": "Main",
   "start_here": "Start Here",
   "trainings": "Trainings",
@@ -50,5 +52,9 @@
   "delshot": "Delete Shot",
   "copyshot": "Copy Shot",
   "mu": "Move Up",
-  "md": "Move Down"
+  "md": "Move Down",
+  "delay": "Delay",
+  "export": "Export",
+  "import": "Import",
+  "help-info": "For the Padelshooter are 3 screens:\n\nStart Here:\nTo start immediately with the machine and easy use. Most trainings are 1 kind of shots at 1 position with some variation. This is the easiest to learn to use the speed, spin, frequency, width, height and net.\n\nTrainings:\nCombinations of shots like bandeja - volley trainings. The volley height is set with \"Net\", the bandeja height with \"Height\". The bandeja needs more time to arrive at the player, so an extra pause could be set with \"Delay\".\n\nPrograms:\nMake your own trainings / programs. The programs should be added to a category like \"Beginner\", \"Advanced\" or \"Shot type\" or \"1 player\", \"2 players\".\n\nThe machine is normally placed in horizontal middle close to back glass. But for training back and side glass balls in corner, it's also useful to place the machine at opposite corner.\nThe basic idea of Padelshooter is to set your preferred settings for speed, spin, frequency, width and height, when using the app for 1st time, these have standard settings and should be changed once and is remembered for each next training.\nFor some trainings the \"net\" is useful, the balls don't go below this net height. In this way you can set in random height trainings the lowest possible position with \"Net\", doesn't matter how low the speed is. For training at Left or Right side of court, you can select by pressing that button or both for whole court. In Trainings screen, you can set the horizontal area even smaller by selecting a % where 0% is most left and 100% is most right (seen from player).\n\nIf you have a problem, visit our website \n\nhttps://padelshooter.com/ \nIn the download section for the Padelshooter 3A, there is useful information to find/solve problems.\nFor help and support, you can contact us (preferable by whatsapp by sending a video) at:\n\nDe Racketclub\nT: 31-630974299 (also whatsapp)\n\nOr contact your distributor."
 }

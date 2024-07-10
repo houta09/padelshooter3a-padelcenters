@@ -31,6 +31,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   flutter:
     sdk: flutter
+  url_launcher: ^6.3.0
   collection: ^1.18.0
   flutter_blue_plus: ^1.32.8
   get: ^4.6.6
@@ -40,6 +41,11 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.19.0
+  path_provider: ^2.1.3
+  share_plus: ^4.0.9
+  file_picker: ^5.2.3
+    # Other dependencies
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -74,17 +80,18 @@ flutter:
 
   assets:
     - assets/lang/en.json
-    - assets/lang/de.json
-    - assets/lang/pt.json
-    - assets/lang/it.json
-    - assets/lang/sv.json
-    - assets/lang/fi.json
     - assets/lang/es.json
     - assets/lang/fr.json
     - assets/lang/zh.json
-    - assets/lang/ja.json
+    - assets/lang/pt.json
     - assets/lang/pl.json
+    - assets/lang/fi.json
+    - assets/lang/sv.json
+    - assets/lang/it.json
+    - assets/lang/de.json
+    - assets/lang/ja.json
     - assets/lang/ar.json
+    - assets/lang/lv.json
     - assets/images/bluetooth-icon.png
     - assets/images/bluetooth-icon-greenbg.png
     - assets/images/Padelbaan_full_2-line.png
@@ -124,7 +131,7 @@ flutter:
     - assets/images/Padelbaan_2-line_green.png
     - assets/images/Padelbaan_hor_movement.png
     - assets/images/Padelbaan_hor_movement_green.png
-    - assets/images/PS3A-black-right.png
+    - assets/images/PS3A-black_transp.png
     - assets/favicon.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

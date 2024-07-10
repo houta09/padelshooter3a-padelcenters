@@ -26,6 +26,7 @@
   "french": "Franska",
   "chinese": "Kinesiska",
   "japanese": "Japanska",
+  "latvia": "Lettland",
   "polish": "Polska",
   "german": "Tyska",
   "portuguese": "Portugisiska",
@@ -33,6 +34,7 @@
   "italian": "Italienska",
   "finnish": "Finska",
   "arabic": "Arabiska",
+  "dutch": "Holländska",
   "main": "Huvud",
   "start_here": "Börja Här",
   "trainings": "Träningar",
@@ -51,5 +53,8 @@
   "delshot": "Radera Skott",
   "copyshot": "Kopiera Skott",
   "mu": "Flytta Upp",
-  "md": "Flytta Ner"
+  "md": "Flytta Ner",
+  "export": "Exportera",
+  "import": "Importera",
+  "help-info": "För Padelshooter finns det 3 skärmar:\n\nStarta här:\nFör att börja omedelbart med maskinen och lättanvändning. De flesta träningar är 1 typ av skott på 1 position med viss variation. Detta är det enklaste sättet att lära sig använda hastighet, spin, frekvens, bredd, höjd och nät.\n\nTräningar:\nKombinationer av skott som bandeja - volley träningar. Volleyhöjden ställs in med \"Nät\", bandejahöjden med \"Höjd\". Bandeja behöver mer tid att nå spelaren, så en extra paus kan ställas in med \"Fördröjning\".\n\nProgram:\nSkapa dina egna träningar/program. Programmen bör läggas till i en kategori som \"Nybörjare\", \"Avancerad\" eller \"Skottyp\" eller \"1 spelare\", \"2 spelare\".\n\nMaskinen placeras normalt i mitten nära bakglaset. Men för träning av bak- och sidoglasbollar i hörnet är det också användbart att placera maskinen i motsatt hörn.\nGrundidén med Padelshooter är att ställa in dina föredragna inställningar för hastighet, spin, frekvens, bredd och höjd. När du använder appen för första gången har dessa standardinställningar och bör ändras en gång och kommas ihåg för varje nästa träning.\nFör vissa träningar är \"nätet\" användbart, bollarna går inte under denna näthöjd. På detta sätt kan du i slumpmässiga höjdträningar ställa in den lägsta möjliga positionen med \"Nät\", oavsett hur låg hastigheten är. För träning på vänster eller höger sida av planen kan du välja genom att trycka på den knappen eller båda för hela planen. På träningsskärmen kan du göra det horisontella området ännu mindre genom att välja en % där 0% är mest till vänster och 100% är mest till höger (sett från spelaren).\n\nOm du har ett problem, besök vår webbplats \n\nhttps://padelshooter.com/ \nI nedladdningssektionen för Padelshooter 3A finns det användbar information för att hitta/lösa problem.\nFör hjälp och support kan du kontakta oss (helst via whatsapp genom att skicka en video) på:\n\nDe Racketclub\nT: 31-630974299 (även whatsapp)\n\nEller kontakta din distributör."
 }

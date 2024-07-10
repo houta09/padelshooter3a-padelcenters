@@ -24,6 +24,7 @@
   "english": "Anglais",
   "german": "Allemand",
   "portuguese": "Portugais",
+  "latvia": "Lettonie",
   "italian": "Italien",
   "swedish": "Suédois",
   "finnish": "Finlandais",
@@ -33,6 +34,7 @@
   "japanese": "Japonais",
   "polish": "Polonais",
   "arabic": "Arabe",
+  "dutch": "Néerlandais",
   "main": "Principal",
   "start_here": "Commencez Ici",
   "trainings": "Entraînements",
@@ -51,5 +53,8 @@
   "delshot": "Supprimer le Tir",
   "copyshot": "Copier le Tir",
   "mu": "Déplacer vers le Haut",
-  "md": "Déplacer vers le Bas"
+  "md": "Déplacer vers le Bas",
+  "export": "Exporter",
+  "import": "Importer",
+  "help-info": "Pour le Padelshooter, il y a 3 écrans:\n\nCommencez ici:\nPour démarrer immédiatement avec la machine et une utilisation facile. La plupart des entraînements sont d'un type de tirs à une position avec quelques variations. C'est le plus simple pour apprendre à utiliser la vitesse, le spin, la fréquence, la largeur, la hauteur et le filet.\n\nEntraînements:\nCombinaisons de tirs comme les entraînements bandeja - volée. La hauteur de la volée est définie avec \"Filet\", la hauteur de la bandeja avec \"Hauteur\". La bandeja a besoin de plus de temps pour arriver au joueur, donc une pause supplémentaire peut être réglée avec \"Délai\".\n\nProgrammes:\nCréez vos propres entraînements / programmes. Les programmes doivent être ajoutés à une catégorie comme \"Débutant\", \"Avancé\" ou \"Type de tir\" ou \"1 joueur\", \"2 joueurs\".\n\nLa machine est normalement placée au centre horizontal près du verre arrière. Mais pour l'entraînement des balles en verre arrière et latéral dans le coin, il est également utile de placer la machine dans le coin opposé.\nL'idée de base de Padelshooter est de définir vos paramètres préférés pour la vitesse, le spin, la fréquence, la largeur et la hauteur. Lors de la première utilisation de l'application, ces paramètres sont définis par défaut et doivent être modifiés une fois et sont mémorisés pour chaque entraînement suivant.\nPour certains entraînements, le \"filet\" est utile, les balles ne passent pas sous cette hauteur de filet. De cette manière, vous pouvez définir dans les entraînements de hauteur aléatoire la position la plus basse possible avec \"Filet\", peu importe la faible vitesse. Pour l'entraînement du côté gauche ou droit du court, vous pouvez sélectionner en appuyant sur ce bouton ou les deux pour tout le court. Dans l'écran Entraînements, vous pouvez rendre la zone horizontale encore plus petite en sélectionnant un % où 0% est le plus à gauche et 100% est le plus à droite (vu du joueur).\n\nSi vous avez un problème, visitez notre site web \n\nhttps://padelshooter.com/ \nDans la section de téléchargement pour le Padelshooter 3A, il y a des informations utiles pour trouver/résoudre des problèmes.\nPour obtenir de l'aide et du soutien, vous pouvez nous contacter (de préférence par whatsapp en envoyant une vidéo) à:\n\nDe Racketclub\nT: 31-630974299 (aussi whatsapp)\n\nOu contactez votre distributeur."
 }

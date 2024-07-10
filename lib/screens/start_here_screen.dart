@@ -32,10 +32,10 @@ class _StartHereScreenState extends State<StartHereScreen> {
     3: 24,
     4: 33,
     5: 21,
-    6: 20,
+    6: 23,
     7: 25,
-    8: 20,
-    9: 20,
+    8: 23,
+    9: 23,
   };
 
   int _currentTrainingValue = 20;
@@ -53,28 +53,28 @@ class _StartHereScreenState extends State<StartHereScreen> {
   Future<void> _loadSettings(int trainingIndex) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _controllers["Speed"]?.text = (prefs.getInt("Speed_$trainingIndex") ?? 15).toString();
-      _controllers["Spin"]?.text = (50 - (prefs.getInt("Spin_$trainingIndex") ?? 50)).toString();
-      _controllers["Freq"]?.text = (prefs.getInt("Freq_$trainingIndex") ?? 40).toString();
-      _controllers["Width"]?.text = (prefs.getInt("Width_$trainingIndex") ?? 100).toString();
-      _controllers["Height"]?.text = (prefs.getInt("Height_$trainingIndex") ?? 40).toString();
-      _controllers["Net"]?.text = (prefs.getInt("Net_$trainingIndex") ?? 0).toString();
-      _leftSelected = prefs.getBool("LeftSelected_$trainingIndex") ?? false;
-      _rightSelected = prefs.getBool("RightSelected_$trainingIndex") ?? false;
+      _controllers["Speed"]?.text = (prefs.getInt("StartHere_Speed_$trainingIndex") ?? 15).toString();
+      _controllers["Spin"]?.text = (50 - (prefs.getInt("StartHere_Spin_$trainingIndex") ?? 50)).toString();
+      _controllers["Freq"]?.text = (prefs.getInt("StartHere_Freq_$trainingIndex") ?? 40).toString();
+      _controllers["Width"]?.text = (prefs.getInt("StartHere_Width_$trainingIndex") ?? 100).toString();
+      _controllers["Height"]?.text = (prefs.getInt("StartHere_Height_$trainingIndex") ?? 40).toString();
+      _controllers["Net"]?.text = (prefs.getInt("StartHere_Net_$trainingIndex") ?? 0).toString();
+      _leftSelected = prefs.getBool("StartHere_LeftSelected_$trainingIndex") ?? false;
+      _rightSelected = prefs.getBool("StartHere_RightSelected_$trainingIndex") ?? false;
     });
     print('*AVH: Loaded settings for training index: $trainingIndex');
   }
 
   Future<void> _saveSettings(int trainingIndex) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt("Speed_$trainingIndex", int.parse(_controllers["Speed"]!.text));
-    await prefs.setInt("Spin_$trainingIndex", 50 - int.parse(_controllers["Spin"]!.text));
-    await prefs.setInt("Freq_$trainingIndex", int.parse(_controllers["Freq"]!.text));
-    await prefs.setInt("Width_$trainingIndex", int.parse(_controllers["Width"]!.text));
-    await prefs.setInt("Height_$trainingIndex", int.parse(_controllers["Height"]!.text));
-    await prefs.setInt("Net_$trainingIndex", int.parse(_controllers["Net"]!.text));
-    await prefs.setBool("LeftSelected_$trainingIndex", _leftSelected);
-    await prefs.setBool("RightSelected_$trainingIndex", _rightSelected);
+    await prefs.setInt("StartHere_Speed_$trainingIndex", int.parse(_controllers["Speed"]!.text));
+    await prefs.setInt("StartHere_Spin_$trainingIndex", 50 - int.parse(_controllers["Spin"]!.text));
+    await prefs.setInt("StartHere_Freq_$trainingIndex", int.parse(_controllers["Freq"]!.text));
+    await prefs.setInt("StartHere_Width_$trainingIndex", int.parse(_controllers["Width"]!.text));
+    await prefs.setInt("StartHere_Height_$trainingIndex", int.parse(_controllers["Height"]!.text));
+    await prefs.setInt("StartHere_Net_$trainingIndex", int.parse(_controllers["Net"]!.text));
+    await prefs.setBool("StartHere_LeftSelected_$trainingIndex", _leftSelected);
+    await prefs.setBool("StartHere_RightSelected_$trainingIndex", _rightSelected);
     print('*AVH: Saved settings for training index: $trainingIndex');
   }
 
@@ -207,7 +207,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildButton(context, AppLocalizations.of(context)?.translate('off') ?? 'Off', 0, bluetoothManager, () {
+          _buildButton(context, AppLocalizations.of(context).translate('off') ?? 'Off', 0, bluetoothManager, () {
             setState(() {
               _activeButton = 0;
               _isPlayActive = false;
@@ -215,7 +215,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
             });
             print('*AVH: Off button pressed');
           }),
-          _buildButton(context, AppLocalizations.of(context)?.translate('play') ?? 'Play', 1, bluetoothManager, () {
+          _buildButton(context, AppLocalizations.of(context).translate('play') ?? 'Play', 1, bluetoothManager, () {
             setState(() {
               _isPlayActive = true;
             });
@@ -251,11 +251,11 @@ class _StartHereScreenState extends State<StartHereScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildFieldButton(AppLocalizations.of(context)?.translate('left') ?? 'Left', _leftSelected, () => _updateFieldSelection("left")),
+          _buildFieldButton(AppLocalizations.of(context).translate('left') ?? 'Left', _leftSelected, () => _updateFieldSelection("left")),
           const SizedBox(width: 6),
-          Text(AppLocalizations.of(context)?.translate('side') ?? 'Side', style: const TextStyle(fontSize: 10, color: Colors.white)),
+          Text(AppLocalizations.of(context).translate('side') ?? 'Side', style: const TextStyle(fontSize: 10, color: Colors.white)),
           const SizedBox(width: 6),
-          _buildFieldButton(AppLocalizations.of(context)?.translate('right') ?? 'Right', _rightSelected, () => _updateFieldSelection("right")),
+          _buildFieldButton(AppLocalizations.of(context).translate('right') ?? 'Right', _rightSelected, () => _updateFieldSelection("right")),
         ],
       ),
     );
@@ -274,7 +274,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
           height: 20,
           child: TextField(
             controller: _controllers[key],
-            keyboardType: TextInputType.numberWithOptions(signed: true),
+            keyboardType: const TextInputType.numberWithOptions(signed: true),
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
             decoration: const InputDecoration(
@@ -359,7 +359,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                AppLocalizations.of(context)?.translate(key.toLowerCase()) ?? key,
+                AppLocalizations.of(context).translate(key.toLowerCase()) ?? key,
                 style: const TextStyle(fontSize: 12, color: Colors.white),
               ),
               Container(
@@ -386,7 +386,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
                 height: 40,
                 child: TextField(
                   controller: _controllers[key],
-                  keyboardType: key == "Spin" ? TextInputType.numberWithOptions(signed: true) : TextInputType.number,
+                  keyboardType: key == "Spin" ? const TextInputType.numberWithOptions(signed: true) : TextInputType.number,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
                   decoration: const InputDecoration(

@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_localizations.dart';
 import '../utils/bluetooth_manager.dart';
-import '../main.dart';
 
 class ProgramsScreen extends StatefulWidget {
   final Function(int) onNavigate;
@@ -380,7 +379,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     controller: _programNameController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)?.translate('pn') ?? 'Program Name',
+                      labelText: AppLocalizations.of(context).translate('pn') ?? 'Program Name',
                       labelStyle: const TextStyle(color: Colors.white),
                     ),
                   ),
@@ -398,7 +397,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                       backgroundColor: _isCategoryButtonPressed ? Colors.blue : Colors.grey[700],
                       fixedSize: const Size(150, 40),
                     ),
-                    child: Text(_selectedCategory ?? (AppLocalizations.of(context)?.translate('cat') ?? 'Category')),
+                    child: Text(_selectedCategory ?? (AppLocalizations.of(context).translate('cat') ?? 'Category')),
                   ),
                   const SizedBox(height: 20),
                   ...List.generate(_currentShotCount, (index) {
@@ -418,7 +417,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                 },
                               ),
                             ),
-                            Text('${AppLocalizations.of(context)?.translate('shot') ?? 'Shot'} ${index + 1}', style: const TextStyle(color: Colors.white, fontSize: 14)),
+                            Text('${AppLocalizations.of(context).translate('shot') ?? 'Shot'} ${index + 1}', style: const TextStyle(color: Colors.white, fontSize: 14)),
                             const SizedBox(width: 10),
                             ..._shots[index].keys.map((key) {
                               return Expanded(
@@ -426,13 +425,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
                                   child: Column(
                                     children: [
-                                      Text(AppLocalizations.of(context)?.translate(key.toLowerCase()) ?? key, style: const TextStyle(color: Colors.white, fontSize: 10)),
+                                      Text(AppLocalizations.of(context).translate(key.toLowerCase()) ?? key, style: const TextStyle(color: Colors.white, fontSize: 10)),
                                       SizedBox(
                                         width: 50,
                                         height: 30,
                                         child: TextField(
                                           controller: _shots[index][key],
-                                          keyboardType: key == "Spin" ? TextInputType.numberWithOptions(signed: true) : TextInputType.number,
+                                          keyboardType: key == "Spin" ? const TextInputType.numberWithOptions(signed: true) : TextInputType.number,
                                           style: const TextStyle(color: Colors.white, fontSize: 10),
                                           decoration: const InputDecoration(
                                             contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
@@ -464,7 +463,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                   ),
                                 ),
                               );
-                            }).toList(),
+                            }),
                           ],
                         ),
                         const Divider(color: Colors.white),
@@ -480,7 +479,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context)?.translate('as') ?? 'Add Shot'),
+                        child: Text(AppLocalizations.of(context).translate('as') ?? 'Add Shot'),
                       ),
                     ),
                   const SizedBox(height: 20),
@@ -500,7 +499,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _isSaveButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context)?.translate('savep') ?? 'Save Program', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context).translate('savep') ?? 'Save Program', style: const TextStyle(fontSize: 12)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -515,7 +514,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _isLoadButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context)?.translate('loadp') ?? 'Load Program', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context).translate('loadp') ?? 'Load Program', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),
@@ -536,7 +535,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _isPlayButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context)?.translate('playprog') ?? 'Play Program', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context).translate('playprog') ?? 'Play Program', style: const TextStyle(fontSize: 12)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -552,7 +551,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _isOffButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context)?.translate('off') ?? 'Off', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context).translate('off') ?? 'Off', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),
@@ -573,7 +572,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _selectedShotIndex != -1 && _isDeleteShotButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context)?.translate('delshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context).translate('delshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
 
                       ),
                       ElevatedButton(
@@ -589,7 +588,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _selectedShotIndex != -1 && _isCopyShotButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context)?.translate('copyshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context).translate('copyshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
 
                       ),
                     ],
@@ -611,7 +610,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _selectedShotIndex > 0 && _isMoveUpButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context)?.translate('mu') ?? 'Move Up', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context).translate('mu') ?? 'Move Up', style: const TextStyle(fontSize: 12)),
                       ),
                       ElevatedButton(
                         onPressed: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 ? () {
@@ -626,7 +625,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 && _isMoveDownButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context)?.translate('md') ?? 'Move Down', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context).translate('md') ?? 'Move Down', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),

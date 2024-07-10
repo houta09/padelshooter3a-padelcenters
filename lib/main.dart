@@ -29,7 +29,7 @@ void main() async {
 
     // Set default to English if not set or not supported
     if (languageCode == null || ![
-      'en', 'es', 'fr', 'zh', 'pt', 'pl', 'fi', 'sv', 'it', 'de', 'ja', 'ar'
+      'en', 'es', 'fr', 'zh', 'pt', 'pl', 'fi', 'lv', 'sv', 'it', 'de', 'ja', 'ar'
     ].contains(languageCode)) {
       languageCode = 'en';
     }
@@ -92,6 +92,7 @@ class _PadelShooterAppState extends State<PadelShooterApp> {
             Locale('zh', ''), // Chinese
             Locale('de', ''), // German
             Locale('pt', ''), // Portuguese
+            Locale('lv', ''), // Latvia
             Locale('it', ''), // Italian
             Locale('sv', ''), // Swedish
             Locale('fi', ''), // Finnish
@@ -165,15 +166,15 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
   String _getPageTitle() {
     switch (_currentPageIndex) {
       case 0:
-        return AppLocalizations.of(context)?.translate('main') ?? 'Main';
+        return AppLocalizations.of(context).translate('main') ?? 'Main';
       case 1:
-        return AppLocalizations.of(context)?.translate('start_here') ?? 'Start Here';
+        return AppLocalizations.of(context).translate('start_here') ?? 'Start Here';
       case 2:
-        return AppLocalizations.of(context)?.translate('trainings') ?? 'Trainings';
+        return AppLocalizations.of(context).translate('trainings') ?? 'Trainings';
       case 3:
-        return AppLocalizations.of(context)?.translate('programs') ?? 'Programs';
+        return AppLocalizations.of(context).translate('programs') ?? 'Programs';
       case 4:
-        return AppLocalizations.of(context)?.translate('settings') ?? 'Settings';
+        return AppLocalizations.of(context).translate('settings') ?? 'Settings';
       default:
         return '';
     }
@@ -204,11 +205,11 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
 
     print('*AVH-lang-m: Building DynamicContentFrame with page index: $_currentPageIndex');
 
-    final String mainLabel = AppLocalizations.of(context)?.translate('main') ?? 'Main';
-    final String startHereLabel = AppLocalizations.of(context)?.translate('start_here') ?? 'Start Here';
-    final String trainingsLabel = AppLocalizations.of(context)?.translate('trainings') ?? 'Trainings';
-    final String programsLabel = AppLocalizations.of(context)?.translate('programs') ?? 'Programs';
-    final String settingsLabel = AppLocalizations.of(context)?.translate('settings') ?? 'Settings';
+    final String mainLabel = AppLocalizations.of(context).translate('main') ?? 'Main';
+    final String startHereLabel = AppLocalizations.of(context).translate('start_here') ?? 'Start Here';
+    final String trainingsLabel = AppLocalizations.of(context).translate('trainings') ?? 'Trainings';
+    final String programsLabel = AppLocalizations.of(context).translate('programs') ?? 'Programs';
+    final String settingsLabel = AppLocalizations.of(context).translate('settings') ?? 'Settings';
 
     print('*AVH-lang-m: Translations - Main: $mainLabel, Start Here: $startHereLabel, Trainings: $trainingsLabel, Programs: $programsLabel, Settings: $settingsLabel');
 
