@@ -190,18 +190,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     try {
       final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/2024/07/training_settings.json'));
+
       if (response.statusCode == 200) {
-        Map<String, dynamic> allSettings = json.decode(response.body);
-        print('*AVH-Import: Settings fetched from web: $allSettings');
+        Map<String, dynamic> settings = json.decode(response.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
 
         for (int i = 1; i <= 9; i++) {
-          await _setTrainingSettings('StartHere', i, allSettings['StartHere_training_$i']);
-          await _setTrainingSettings('Trainings', i, allSettings['Trainings_training_$i']);
+          await prefs.setInt("StartHere_Speed_$i", settings['StartHere_training_$i']["Speed"] as int);
+          await prefs.setInt("StartHere_Spin_$i", 50 - (settings['StartHere_training_$i']["Spin"] as int));
+          await prefs.setInt("StartHere_Freq_$i", settings['StartHere_training_$i']["Freq"] as int);
+          await prefs.setInt("StartHere_Width_$i", settings['StartHere_training_$i']["Width"] as int);
+          await prefs.setInt("StartHere_Height_$i", settings['StartHere_training_$i']["Height"] as int);
+          await prefs.setInt("StartHere_Net_$i", settings['StartHere_training_$i']["Net"] as int);
+          await prefs.setInt("StartHere_Delay_$i", settings['StartHere_training_$i']["Delay"] as int);
+          await prefs.setBool("StartHere_LeftSelected_$i", settings['StartHere_training_$i']["LeftSelected"] as bool);
+          await prefs.setBool("StartHere_RightSelected_$i", settings['StartHere_training_$i']["RightSelected"] as bool);
+
+          await prefs.setInt("Trainings_Speed_$i", settings['Trainings_training_$i']["Speed"] as int);
+          await prefs.setInt("Trainings_Spin_$i", 50 - (settings['Trainings_training_$i']["Spin"] as int));
+          await prefs.setInt("Trainings_Freq_$i", settings['Trainings_training_$i']["Freq"] as int);
+          await prefs.setInt("Trainings_Width_$i", settings['Trainings_training_$i']["Width"] as int);
+          await prefs.setInt("Trainings_Height_$i", settings['Trainings_training_$i']["Height"] as int);
+          await prefs.setInt("Trainings_Net_$i", settings['Trainings_training_$i']["Net"] as int);
+          await prefs.setInt("Trainings_Delay_$i", settings['Trainings_training_$i']["Delay"] as int);
+          await prefs.setBool("Trainings_LeftSelected_$i", settings['Trainings_training_$i']["LeftSelected"] as bool);
+          await prefs.setBool("Trainings_RightSelected_$i", settings['Trainings_training_$i']["RightSelected"] as bool);
         }
 
-        print('*AVH-Import: Settings imported from web successfully');
+        print('*AVH-Import: Settings imported successfully from web');
       } else {
-        print('*AVH-Import: Failed to fetch settings from web. Status code: ${response.statusCode}');
+        print('*AVH-Import: Error fetching settings from web. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print('*AVH-Import: Error importing settings from web: $e');
@@ -267,10 +285,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 text: TextSpan(
                   text: AppLocalizations.of(context)?.translate('help-info'),
                   style: const TextStyle(color: Colors.black, fontSize: 16),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      _launchURL('https://padelshooter.com/');
-                    },
                 ),
               ),
               const SizedBox(height: 20),

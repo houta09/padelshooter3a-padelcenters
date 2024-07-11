@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:http/http.dart' as http;
 import 'screens/main_screen.dart';
 import 'screens/start_here_screen.dart';
 import 'screens/trainings_screen.dart';
@@ -10,11 +11,53 @@ import 'screens/programs_screen.dart';
 import 'screens/settings_screen.dart';
 import 'utils/bluetooth_manager.dart';
 import 'utils/app_localizations.dart';
+import 'dart:convert';
 
 Future<void> clearArabicLanguagePreference() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (prefs.getString('language_code') == 'ar') {
     await prefs.remove('language_code');
+  }
+}
+
+Future<void> _importSettingsFromWeb() async {
+  print('*AVH-Import: Import from Web function called');
+  try {
+    final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/2024/07/training_settings.json'));
+
+    if (response.statusCode == 200) {
+      print('*AVH-Import: Successfully fetched settings from web');
+      Map<String, dynamic> settings = json.decode(response.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      for (int i = 1; i <= 9; i++) {
+        await prefs.setInt("StartHere_Speed_$i", settings['StartHere_training_$i']["Speed"] as int);
+        await prefs.setInt("StartHere_Spin_$i", 50 - (settings['StartHere_training_$i']["Spin"] as int));
+        await prefs.setInt("StartHere_Freq_$i", settings['StartHere_training_$i']["Freq"] as int);
+        await prefs.setInt("StartHere_Width_$i", settings['StartHere_training_$i']["Width"] as int);
+        await prefs.setInt("StartHere_Height_$i", settings['StartHere_training_$i']["Height"] as int);
+        await prefs.setInt("StartHere_Net_$i", settings['StartHere_training_$i']["Net"] as int);
+        await prefs.setInt("StartHere_Delay_$i", settings['StartHere_training_$i']["Delay"] as int);
+        await prefs.setBool("StartHere_LeftSelected_$i", settings['StartHere_training_$i']["LeftSelected"] as bool);
+        await prefs.setBool("StartHere_RightSelected_$i", settings['StartHere_training_$i']["RightSelected"] as bool);
+
+        await prefs.setInt("Trainings_Speed_$i", settings['Trainings_training_$i']["Speed"] as int);
+        await prefs.setInt("Trainings_Spin_$i", 50 - (settings['Trainings_training_$i']["Spin"] as int));
+        await prefs.setInt("Trainings_Freq_$i", settings['Trainings_training_$i']["Freq"] as int);
+        await prefs.setInt("Trainings_Width_$i", settings['Trainings_training_$i']["Width"] as int);
+        await prefs.setInt("Trainings_Height_$i", settings['Trainings_training_$i']["Height"] as int);
+        await prefs.setInt("Trainings_Net_$i", settings['Trainings_training_$i']["Net"] as int);
+        await prefs.setInt("Trainings_Delay_$i", settings['Trainings_training_$i']["Delay"] as int);
+        await prefs.setBool("Trainings_LeftSelected_$i", settings['Trainings_training_$i']["LeftSelected"] as bool);
+        await prefs.setBool("Trainings_RightSelected_$i", settings['Trainings_training_$i']["RightSelected"] as bool);
+      }
+
+      print('*AVH-Import: Settings imported successfully from web');
+    } else {
+      print('*AVH-Import: Error fetching settings from web. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('*AVH-Import: Error importing settings from web: $e');
   }
 }
 
@@ -35,6 +78,9 @@ void main() async {
     }
 
     print('*AVH-lang-m: Initial language code from preferences: $languageCode');
+
+    await _importSettingsFromWeb();
+
     runApp(PadelShooterApp(initialLocale: Locale(languageCode)));
   });
 }
