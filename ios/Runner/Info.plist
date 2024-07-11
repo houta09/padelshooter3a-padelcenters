@@ -77,13 +77,20 @@
     <string>Your app needs location access to detect Bluetooth devices in the background.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Your app needs location access to detect Bluetooth devices while the app is in use.</string>
-    <key>CFBundleLocalizations</key>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>App needs access to the photo library</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>App needs access to add photos to your library</string>
     <key>NSDocumentsFolderUsageDescription</key>
     <string>App needs access to the documents folder</string>
+    <key>NSFileProviderDomainUsageDescription</key>
+    <string>App needs access to file provider domain</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
+    <key>CFBundleLocalizations</key>
     <array>
         <string>en</string>
         <string>es</string>
@@ -97,7 +104,6 @@
         <string>pl</string>
         <string>ja</string>
         <string>ar</string>
-        <string>du</string>
     </array>
 </dict>
 </plist>

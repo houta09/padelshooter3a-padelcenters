@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -184,6 +185,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _importSettingsFromWeb() async {
+    print('*AVH-Import: Import from Web button pressed');
+
+    try {
+      final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/2024/07/training_settings.json'));
+      if (response.statusCode == 200) {
+        Map<String, dynamic> allSettings = json.decode(response.body);
+        print('*AVH-Import: Settings fetched from web: $allSettings');
+
+        for (int i = 1; i <= 9; i++) {
+          await _setTrainingSettings('StartHere', i, allSettings['StartHere_training_$i']);
+          await _setTrainingSettings('Trainings', i, allSettings['Trainings_training_$i']);
+        }
+
+        print('*AVH-Import: Settings imported from web successfully');
+      } else {
+        print('*AVH-Import: Failed to fetch settings from web. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('*AVH-Import: Error importing settings from web: $e');
+    }
+  }
+
   void _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -245,18 +269,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: const TextStyle(color: Colors.black, fontSize: 16),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
-                      _launchURL('https://padelshooter.com/downloads_ps3a/#Problem');
+                      _launchURL('https://padelshooter.com/');
                     },
                 ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _exportSettings,
-                child: Text('Export Settings'),
+                child: Text(AppLocalizations.of(context)?.translate('export') ?? 'Export'),
               ),
               ElevatedButton(
                 onPressed: _importSettings,
-                child: Text('Import Settings'),
+                child: Text(AppLocalizations.of(context)?.translate('import') ?? 'Import'),
+              ),
+              ElevatedButton(
+                onPressed: _importSettingsFromWeb,
+                child: Text(AppLocalizations.of(context)?.translate('import_from_web') ?? 'Import from Web'),
               ),
             ],
           ),
