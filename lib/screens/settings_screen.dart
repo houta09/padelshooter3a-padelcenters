@@ -69,16 +69,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _requestPermissions() async {
-    var status = await Permission.manageExternalStorage.status;
-    if (!status.isGranted) {
-      status = await Permission.manageExternalStorage.request();
-      print('*AVH-Export: Storage permission requested. New status: $status');
+    if (Platform.isAndroid) {
+      var status = await Permission.manageExternalStorage.status;
+      if (!status.isGranted) {
+        status = await Permission.manageExternalStorage.request();
+        print('*AVH-Export: Storage permission requested. New status: $status');
+      }
+      if (status.isGranted) {
+        print('*AVH-Export: Storage permission granted.');
+      } else {
+        print('*AVH-Export: Storage permission not granted.');
+      }
     }
-    if (status.isGranted) {
-      print('*AVH-Export: Storage permission granted.');
-    } else {
-      print('*AVH-Export: Storage permission not granted.');
+  }
+
+  Future<String> _getFilePath(String fileName) async {
+    if (Platform.isAndroid) {
+      final downloadsDirectory = Directory('/storage/emulated/0/Download');
+      return '${downloadsDirectory.path}/$fileName';
+    } else if (Platform.isIOS) {
+      final directory = await getApplicationDocumentsDirectory();
+      return '${directory.path}/$fileName';
     }
+    throw UnsupportedError("Unsupported platform");
   }
 
   Future<Map<String, dynamic>> _getTrainingSettings(String prefix, int trainingIndex) async {
@@ -113,11 +126,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportSettings() async {
     print('*AVH-Export: Export button pressed');
-    var status = await Permission.manageExternalStorage.status;
-    if (!status.isGranted) {
-      print('*AVH-Export: Storage permission not granted. Cannot export settings.');
-      await _requestPermissions();
-      return;
+    if (Platform.isAndroid) {
+      var status = await Permission.manageExternalStorage.status;
+      if (!status.isGranted) {
+        print('*AVH-Export: Storage permission not granted. Cannot export settings.');
+        await _requestPermissions();
+        return;
+      }
     }
 
     Map<String, dynamic> allSettings = {};
@@ -128,21 +143,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     print('*AVH-Export: Settings to export: $allSettings');
 
     try {
-      final downloadsDirectory = Directory('/storage/emulated/0/Download');
-      print('*AVH-Export: Downloads directory: ${downloadsDirectory.path}');
-      if (downloadsDirectory == null) {
-        print('*AVH-Export: Downloads directory is null');
-        return;
-      }
-
-      final file = File('${downloadsDirectory.path}/training_settings.json');
-      print('*AVH-Export: File path: ${file.path}');
+      final filePath = await _getFilePath('training_settings.json');
+      final file = File(filePath);
+      print('*AVH-Export: File path: $filePath');
 
       await file.create(recursive: true);
       await file.writeAsString(json.encode(allSettings));
 
       if (await file.exists()) {
-        print('*AVH-Export: File exists: ${file.path}');
+        print('*AVH-Export: File exists: $filePath');
         String content = await file.readAsString();
         print('*AVH-Export: File content: $content');
 
@@ -158,23 +167,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _importSettings() async {
     print('*AVH-Import: Import button pressed');
-    var status = await Permission.manageExternalStorage.status;
-    if (!status.isGranted) {
-      print('*AVH-Import: Storage permission not granted. Cannot import settings.');
-      await _requestPermissions();
-      return;
+    if (Platform.isAndroid) {
+      var status = await Permission.manageExternalStorage.status;
+      if (!status.isGranted) {
+        print('*AVH-Import: Storage permission not granted. Cannot import settings.');
+        await _requestPermissions();
+        return;
+      }
     }
 
     try {
-      final downloadsDirectory = Directory('/storage/emulated/0/Download');
-      print('*AVH-Import: Downloads directory: ${downloadsDirectory.path}');
-      if (downloadsDirectory == null) {
-        print('*AVH-Import: Downloads directory is null');
-        return;
-      }
-
-      final file = File('${downloadsDirectory.path}/training_settings.json');
-      print('*AVH-Import: File path: ${file.path}');
+      final filePath = await _getFilePath('training_settings.json');
+      final file = File(filePath);
+      print('*AVH-Import: File path: $filePath');
 
       if (await file.exists()) {
         String content = await file.readAsString();
@@ -238,11 +243,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportPrograms() async {
     print('*AVH-Export: Export Programs button pressed');
-    var status = await Permission.manageExternalStorage.status;
-    if (!status.isGranted) {
-      print('*AVH-Export: Storage permission not granted. Cannot export programs.');
-      await _requestPermissions();
-      return;
+    if (Platform.isAndroid) {
+      var status = await Permission.manageExternalStorage.status;
+      if (!status.isGranted) {
+        print('*AVH-Export: Storage permission not granted. Cannot export programs.');
+        await _requestPermissions();
+        return;
+      }
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -272,21 +279,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     print('*AVH-Export: Programs to export: $allPrograms');
 
     try {
-      final downloadsDirectory = Directory('/storage/emulated/0/Download');
-      print('*AVH-Export: Downloads directory: ${downloadsDirectory.path}');
-      if (downloadsDirectory == null) {
-        print('*AVH-Export: Downloads directory is null');
-        return;
-      }
-
-      final file = File('${downloadsDirectory.path}/programs.json');
-      print('*AVH-Export: File path: ${file.path}');
+      final filePath = await _getFilePath('programs.json');
+      final file = File(filePath);
+      print('*AVH-Export: File path: $filePath');
 
       await file.create(recursive: true);
       await file.writeAsString(json.encode(allPrograms));
 
       if (await file.exists()) {
-        print('*AVH-Export: File exists: ${file.path}');
+        print('*AVH-Export: File exists: $filePath');
         String content = await file.readAsString();
         print('*AVH-Export: File content: $content');
 
@@ -302,23 +303,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _importPrograms() async {
     print('*AVH-Import: Import Programs button pressed');
-    var status = await Permission.manageExternalStorage.status;
-    if (!status.isGranted) {
-      print('*AVH-Import: Storage permission not granted. Cannot import programs.');
-      await _requestPermissions();
-      return;
+    if (Platform.isAndroid) {
+      var status = await Permission.manageExternalStorage.status;
+      if (!status.isGranted) {
+        print('*AVH-Import: Storage permission not granted. Cannot import programs.');
+        await _requestPermissions();
+        return;
+      }
     }
 
     try {
-      final downloadsDirectory = Directory('/storage/emulated/0/Download');
-      print('*AVH-Import: Downloads directory: ${downloadsDirectory.path}');
-      if (downloadsDirectory == null) {
-        print('*AVH-Import: Downloads directory is null');
-        return;
-      }
-
-      final file = File('${downloadsDirectory.path}/programs.json');
-      print('*AVH-Import: File path: ${file.path}');
+      final filePath = await _getFilePath('programs.json');
+      final file = File(filePath);
+      print('*AVH-Import: File path: $filePath');
 
       if (await file.exists()) {
         String content = await file.readAsString();
