@@ -88,6 +88,12 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
     print('*AVH: Saved settings for training index: $trainingIndex');
   }
 
+  Future<int> _getMaxSpeed() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String mode = prefs.getString('selected_mode') ?? 'Padel';
+    return mode == 'Tennis' ? 250 : 100;
+  }
+
   void _updateValue(String key, int change) {
     setState(() {
       int newValue;
@@ -244,14 +250,15 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
             });
             print('*AVH: Off button pressed');
           }),
-          _buildButton(context, AppLocalizations.of(context).translate('play') ?? 'Play', 1, bluetoothManager, () {
+          _buildButton(context, AppLocalizations.of(context).translate('play') ?? 'Play', 1, bluetoothManager, () async {
             setState(() {
               _isPlayActive = true;
             });
             var fieldValues = _getFieldValues();
+            int maxSpeed = await _getMaxSpeed();
             bluetoothManager.sendCommandToPadelshooter(
               command: 10,
-              maxSpeed: 100,
+              maxSpeed: maxSpeed,
               delayLevel: int.parse(_controllers["Delay"]!.text),
               hmin: fieldValues["Hmin"]!,
               hmax: fieldValues["Hmax"]!,
@@ -267,7 +274,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
               generalInfo: 1,
               endByte: 255,
             );
-            print('*AVH: Play button pressed with settings: ${_controllers["Speed"]!.text}, ${_controllers["Spin"]!.text}, ${_controllers["Freq"]!.text}');
+            print('*AVH: Play button pressed with maxSpeed: $maxSpeed, settings: ${_controllers["Speed"]!.text}, ${_controllers["Spin"]!.text}, ${_controllers["Freq"]!.text}');
           }),
         ],
       ),

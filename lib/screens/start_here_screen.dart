@@ -148,6 +148,12 @@ class _StartHereScreenState extends State<StartHereScreen> {
     return {"Hmin": hmin, "Hmax": hmax};
   }
 
+  Future<int> _getMaxSpeed() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String mode = prefs.getString('selected_mode') ?? 'Padel';
+    return mode == 'Tennis' ? 250 : 100;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<BluetoothManager>(
@@ -215,14 +221,15 @@ class _StartHereScreenState extends State<StartHereScreen> {
             });
             print('*AVH: Off button pressed');
           }),
-          _buildButton(context, AppLocalizations.of(context).translate('play') ?? 'Play', 1, bluetoothManager, () {
+          _buildButton(context, AppLocalizations.of(context).translate('play') ?? 'Play', 1, bluetoothManager, () async {
             setState(() {
               _isPlayActive = true;
             });
             var fieldValues = _getFieldValues();
+            int maxSpeed = await _getMaxSpeed();
             bluetoothManager.sendCommandToPadelshooter(
               command: 10,
-              maxSpeed: 100,
+              maxSpeed: maxSpeed,
               delayLevel: 50,
               hmin: fieldValues["Hmin"]!,
               hmax: fieldValues["Hmax"]!,
@@ -238,7 +245,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
               generalInfo: 1,
               endByte: 255,
             );
-            print('*AVH: Play button pressed with settings: ${_controllers["Speed"]!.text}, ${_controllers["Spin"]!.text}, ${_controllers["Freq"]!.text}');
+            print('*AVH: Play button pressed with maxSpeed: $maxSpeed, settings: ${_controllers["Speed"]!.text}, ${_controllers["Spin"]!.text}, ${_controllers["Freq"]!.text}');
           }),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:collection/collection.dart';
@@ -9,9 +10,7 @@ class BluetoothManager extends ChangeNotifier {
   factory BluetoothManager() => _singleton;
 
   BluetoothManager._internal() {
-    print("*AVH: Before initialize BT Manager");
     initialize();
-    print("*AVH: After initialize BT Manager");
   }
 
   late BluetoothDevice device;
@@ -24,20 +23,15 @@ class BluetoothManager extends ChangeNotifier {
   static const String characteristicUUID = "fff2";
 
   Future<void> initialize() async {
-    print("*AVH: Before Request Permissions");
     await requestPermissions();
-    print("*AVH: After Request Permissions");
     await initializeBluetooth();
-    print("*AVH: After Initialize Bluetooth");
   }
 
   Future<void> requestPermissions() async {
-    // Request location permission for both Android and iOS
     if (await Permission.locationWhenInUse.isDenied) {
       await Permission.locationWhenInUse.request();
     }
 
-    // Request Bluetooth permissions specifically for iOS
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       if (await Permission.bluetooth.isDenied) {
         await Permission.bluetooth.request();
@@ -54,23 +48,17 @@ class BluetoothManager extends ChangeNotifier {
   }
 
   Future<void> initializeBluetooth() async {
-    print("Initializing Bluetooth...");
     FlutterBluePlus.adapterState.listen((state) async {
       if (state == BluetoothAdapterState.on) {
-        print("Bluetooth is ON");
         await scanForDevices();
-      } else {
-        print("Bluetooth is OFF or not ready");
       }
     });
   }
 
   Future<void> scanForDevices() async {
     if (isScanning) {
-      print("Already scanning for devices...");
       return;
     }
-    print("Scanning for devices...");
     isScanning = true;
     var completer = Completer<void>();
     StreamSubscription<List<ScanResult>>? scanSubscription;
@@ -78,7 +66,6 @@ class BluetoothManager extends ChangeNotifier {
     scanSubscription = FlutterBluePlus.scanResults.listen((results) {
       var foundDevice = results.firstWhereOrNull((result) => result.device.name.toLowerCase() == "padelshooter");
       if (foundDevice != null) {
-        print("Device found: ${foundDevice.device.name}");
         FlutterBluePlus.stopScan();
         isScanning = false;
         connect(foundDevice.device).then((_) => completer.complete()).catchError((error) => completer.completeError(error))
@@ -93,17 +80,14 @@ class BluetoothManager extends ChangeNotifier {
     scanSubscription.cancel();
 
     if (!isConnected) {
-      print("Device not found, starting reconnection loop...");
       _startReconnectionLoop();
     }
   }
 
   void _startReconnectionLoop() {
-    print("Starting reconnection loop...");
     _reconnectionTimer?.cancel();
     _reconnectionTimer = Timer.periodic(const Duration(seconds: 20), (_) async {
       if (!isConnected) {
-        print("Reconnection attempt...");
         await scanForDevices();
       }
     });
@@ -111,14 +95,11 @@ class BluetoothManager extends ChangeNotifier {
 
   Future<void> connect(BluetoothDevice device) async {
     this.device = device;
-    print("Connecting to device: ${device.name}");
     _deviceStateSubscription = this.device.connectionState.listen((state) {
       isConnected = state == BluetoothConnectionState.connected;
-      notifyListeners();  // Notify listeners about the connection status change
-      print("Connection state changed: $state");
+      notifyListeners();
       if (isConnected) {
         _reconnectionTimer?.cancel();
-        print("Connected to device.");
       } else {
         _startReconnectionLoop();
       }
@@ -127,10 +108,9 @@ class BluetoothManager extends ChangeNotifier {
     try {
       await this.device.connect();
       services = await this.device.discoverServices();
-      notifyListeners();  // Notify listeners after services are discovered
+      notifyListeners();
     } catch (e) {
-      print('Error connecting to device: $e');
-      notifyListeners();  // Notify listeners about the error
+      notifyListeners();
       _startReconnectionLoop();
     }
   }
@@ -173,15 +153,15 @@ class BluetoothManager extends ChangeNotifier {
     await sendData(intData, serviceUUID, characteristicUUID);
   }
 
-  Future<void> sendProgramToPadelshooter(List<List<int>> program) async {
-    List<int> intData = [11, 100, 0, 0, 100, 100, 9, 0]; // Command, maxSpeed, delayLevel, hmin, hmax, startSpeed, speedFactor, generalInfo
+  Future<void> sendProgramToPadelshooter(List<List<int>> program, int maxSpeed) async {
+    List<int> intData = [11, maxSpeed, 0, 0, 100, 100, 9, 0];
     for (var shot in program) {
-      if (shot.any((value) => value != 0)) { // Only send shots with non-zero values
+      if (shot.any((value) => value != 0)) {
         intData.addAll(shot);
-        intData.add(254); // End of shot
+        intData.add(254);
       }
     }
-    intData.add(255); // End of program
+    intData.add(255);
     await sendData(intData, serviceUUID, characteristicUUID);
   }
 

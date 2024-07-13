@@ -42,11 +42,21 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   bool _isCopyShotButtonPressed = false;
   bool _isMoveUpButtonPressed = false;
   bool _isMoveDownButtonPressed = false;
+  int _maxSpeed = 100;
 
   @override
   void initState() {
     super.initState();
     _bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
+    _loadModePreference();
+  }
+
+  Future<void> _loadModePreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String mode = prefs.getString('selected_mode') ?? 'Padel';
+    setState(() {
+      _maxSpeed = mode == 'Tennis' ? 250 : 100;
+    });
   }
 
   Future<void> _saveProgram() async {
@@ -134,7 +144,11 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         program.add(shot);
       }
     }
-    await _bluetoothManager?.sendProgramToPadelshooter(program);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String mode = prefs.getString('selected_mode') ?? 'Padel';
+    int maxSpeed = mode == 'Tennis' ? 250 : 100;
+
+    await _bluetoothManager?.sendProgramToPadelshooter(program, maxSpeed);
     print('*AVH: Program played: ${_programNameController.text}');
   }
 
