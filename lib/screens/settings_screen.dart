@@ -69,29 +69,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _requestPermissions() async {
-    if (Platform.isAndroid) {
-      var status = await Permission.manageExternalStorage.status;
-      if (!status.isGranted) {
-        status = await Permission.manageExternalStorage.request();
-        print('*AVH-Export: Storage permission requested. New status: $status');
-      }
-      if (status.isGranted) {
-        print('*AVH-Export: Storage permission granted.');
-      } else {
-        print('*AVH-Export: Storage permission not granted.');
-      }
+    print('*AVH-Export: Requesting storage permission');
+    PermissionStatus status = await Permission.manageExternalStorage.status;
+    print('*AVH-Export: Initial permission status: $status');
+    if (status.isDenied) {
+      status = await Permission.manageExternalStorage.request();
+      print('*AVH-Export: Requested permission status: $status');
     }
-  }
-
-  Future<String> _getFilePath(String fileName) async {
-    if (Platform.isAndroid) {
-      final downloadsDirectory = Directory('/storage/emulated/0/Download');
-      return '${downloadsDirectory.path}/$fileName';
-    } else if (Platform.isIOS) {
-      final directory = await getApplicationDocumentsDirectory();
-      return '${directory.path}/$fileName';
+    if (status.isGranted) {
+      print('*AVH-Export: Storage permission granted.');
+    } else {
+      print('*AVH-Export: Storage permission not granted. Status: $status');
     }
-    throw UnsupportedError("Unsupported platform");
   }
 
   Future<Map<String, dynamic>> _getTrainingSettings(String prefix, int trainingIndex) async {
@@ -126,13 +115,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportSettings() async {
     print('*AVH-Export: Export button pressed');
-    if (Platform.isAndroid) {
-      var status = await Permission.manageExternalStorage.status;
-      if (!status.isGranted) {
-        print('*AVH-Export: Storage permission not granted. Cannot export settings.');
-        await _requestPermissions();
-        return;
-      }
+    var status = await Permission.manageExternalStorage.status;
+    if (!status.isGranted) {
+      print('*AVH-Export: Storage permission not granted. Cannot export settings.');
+      await _requestPermissions();
+      return;
     }
 
     Map<String, dynamic> allSettings = {};
@@ -143,19 +130,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
     print('*AVH-Export: Settings to export: $allSettings');
 
     try {
-      final filePath = await _getFilePath('training_settings.json');
-      final file = File(filePath);
-      print('*AVH-Export: File path: $filePath');
+      final downloadsDirectory = Directory('/storage/emulated/0/Download');
+      print('*AVH-Export: Downloads directory: ${downloadsDirectory.path}');
+      if (downloadsDirectory == null) {
+        print('*AVH-Export: Downloads directory is null');
+        return;
+      }
+
+      final file = File('${downloadsDirectory.path}/training_settings.json');
+      print('*AVH-Export: File path: ${file.path}');
 
       await file.create(recursive: true);
       await file.writeAsString(json.encode(allSettings));
 
       if (await file.exists()) {
-        print('*AVH-Export: File exists: $filePath');
+        print('*AVH-Export: File exists: ${file.path}');
         String content = await file.readAsString();
         print('*AVH-Export: File content: $content');
 
-        Share.shareFiles([file.path], text: 'Here are my PadelShooter settings.');
+        Share.shareXFiles([XFile(file.path)], text: 'Here are my PadelShooter settings.');
         print('*AVH-Export: Share dialog opened');
       } else {
         print('*AVH-Export: File not found');
@@ -167,19 +160,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _importSettings() async {
     print('*AVH-Import: Import button pressed');
-    if (Platform.isAndroid) {
-      var status = await Permission.manageExternalStorage.status;
-      if (!status.isGranted) {
-        print('*AVH-Import: Storage permission not granted. Cannot import settings.');
-        await _requestPermissions();
-        return;
-      }
+    var status = await Permission.manageExternalStorage.status;
+    if (!status.isGranted) {
+      print('*AVH-Import: Storage permission not granted. Cannot import settings.');
+      await _requestPermissions();
+      return;
     }
 
     try {
-      final filePath = await _getFilePath('training_settings.json');
-      final file = File(filePath);
-      print('*AVH-Import: File path: $filePath');
+      final downloadsDirectory = Directory('/storage/emulated/0/Download');
+      print('*AVH-Import: Downloads directory: ${downloadsDirectory.path}');
+      if (downloadsDirectory == null) {
+        print('*AVH-Import: Downloads directory is null');
+        return;
+      }
+
+      final file = File('${downloadsDirectory.path}/training_settings.json');
+      print('*AVH-Import: File path: ${file.path}');
 
       if (await file.exists()) {
         String content = await file.readAsString();
@@ -211,45 +208,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
         for (int i = 1; i <= 9; i++) {
-          await prefs.setInt("StartHere_Speed_$i", settings['StartHere_training_$i']["Speed"] as int);
-          await prefs.setInt("StartHere_Spin_$i", 50 - (settings['StartHere_training_$i']["Spin"] as int));
-          await prefs.setInt("StartHere_Freq_$i", settings['StartHere_training_$i']["Freq"] as int);
-          await prefs.setInt("StartHere_Width_$i", settings['StartHere_training_$i']["Width"] as int);
-          await prefs.setInt("StartHere_Height_$i", settings['StartHere_training_$i']["Height"] as int);
-          await prefs.setInt("StartHere_Net_$i", settings['StartHere_training_$i']["Net"] as int);
-          await prefs.setInt("StartHere_Delay_$i", settings['StartHere_training_$i']["Delay"] as int);
-          await prefs.setBool("StartHere_LeftSelected_$i", settings['StartHere_training_$i']["LeftSelected"] as bool);
-          await prefs.setBool("StartHere_RightSelected_$i", settings['StartHere_training_$i']["RightSelected"] as bool);
+          await prefs.setInt('StartHere_Speed_$i', settings['StartHere_training_$i']['Speed'] as int);
+          await prefs.setInt('StartHere_Spin_$i', 50 - (settings['StartHere_training_$i']['Spin'] as int));
+          await prefs.setInt('StartHere_Freq_$i', settings['StartHere_training_$i']['Freq'] as int);
+          await prefs.setInt('StartHere_Width_$i', settings['StartHere_training_$i']['Width'] as int);
+          await prefs.setInt('StartHere_Height_$i', settings['StartHere_training_$i']['Height'] as int);
+          await prefs.setInt('StartHere_Net_$i', settings['StartHere_training_$i']['Net'] as int);
+          await prefs.setInt('StartHere_Delay_$i', settings['StartHere_training_$i']['Delay'] as int);
+          await prefs.setBool('StartHere_LeftSelected_$i', settings['StartHere_training_$i']['LeftSelected'] as bool);
+          await prefs.setBool('StartHere_RightSelected_$i', settings['StartHere_training_$i']['RightSelected'] as bool);
 
-          await prefs.setInt("Trainings_Speed_$i", settings['Trainings_training_$i']["Speed"] as int);
-          await prefs.setInt("Trainings_Spin_$i", 50 - (settings['Trainings_training_$i']["Spin"] as int));
-          await prefs.setInt("Trainings_Freq_$i", settings['Trainings_training_$i']["Freq"] as int);
-          await prefs.setInt("Trainings_Width_$i", settings['Trainings_training_$i']["Width"] as int);
-          await prefs.setInt("Trainings_Height_$i", settings['Trainings_training_$i']["Height"] as int);
-          await prefs.setInt("Trainings_Net_$i", settings['Trainings_training_$i']["Net"] as int);
-          await prefs.setInt("Trainings_Delay_$i", settings['Trainings_training_$i']["Delay"] as int);
-          await prefs.setBool("Trainings_LeftSelected_$i", settings['Trainings_training_$i']["LeftSelected"] as bool);
-          await prefs.setBool("Trainings_RightSelected_$i", settings['Trainings_training_$i']["RightSelected"] as bool);
+          await prefs.setInt('Trainings_Speed_$i', settings['Trainings_training_$i']['Speed'] as int);
+          await prefs.setInt('Trainings_Spin_$i', 50 - (settings['Trainings_training_$i']['Spin'] as int));
+          await prefs.setInt('Trainings_Freq_$i', settings['Trainings_training_$i']['Freq'] as int);
+          await prefs.setInt('Trainings_Width_$i', settings['Trainings_training_$i']['Width'] as int);
+          await prefs.setInt('Trainings_Height_$i', settings['Trainings_training_$i']['Height'] as int);
+          await prefs.setInt('Trainings_Net_$i', settings['Trainings_training_$i']['Net'] as int);
+          await prefs.setInt('Trainings_Delay_$i', settings['Trainings_training_$i']['Delay'] as int);
+          await prefs.setBool('Trainings_LeftSelected_$i', settings['Trainings_training_$i']['LeftSelected'] as bool);
+          await prefs.setBool('Trainings_RightSelected_$i', settings['Trainings_training_$i']['RightSelected'] as bool);
         }
 
-        print('*AVH-Import: Settings imported successfully from web');
-      } else {
-        print('*AVH-Import: Error fetching settings from web. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('*AVH-Import: Error importing settings from web: $e');
-    }
-  }
+          print('*AVH-Import: Settings imported successfully from web');
+              } else {
+              print('*AVH-Import: Error fetching settings from web. Status code: ${response.statusCode}');
+              }
+          } catch (e) {
+            print('*AVH-Import: Error importing settings from web: $e');
+          }
+        }
 
   Future<void> _exportPrograms() async {
     print('*AVH-Export: Export Programs button pressed');
-    if (Platform.isAndroid) {
-      var status = await Permission.manageExternalStorage.status;
-      if (!status.isGranted) {
-        print('*AVH-Export: Storage permission not granted. Cannot export programs.');
-        await _requestPermissions();
-        return;
-      }
+    var status = await Permission.manageExternalStorage.status;
+    if (!status.isGranted) {
+      print('*AVH-Export: Storage permission not granted. Cannot export programs.');
+      await _requestPermissions();
+      return;
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -279,19 +274,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
     print('*AVH-Export: Programs to export: $allPrograms');
 
     try {
-      final filePath = await _getFilePath('programs.json');
-      final file = File(filePath);
-      print('*AVH-Export: File path: $filePath');
+      final downloadsDirectory = Directory('/storage/emulated/0/Download');
+      print('*AVH-Export: Downloads directory: ${downloadsDirectory.path}');
+      if (downloadsDirectory == null) {
+        print('*AVH-Export: Downloads directory is null');
+        return;
+      }
+
+      final file = File('${downloadsDirectory.path}/programs.json');
+      print('*AVH-Export: File path: ${file.path}');
 
       await file.create(recursive: true);
       await file.writeAsString(json.encode(allPrograms));
 
       if (await file.exists()) {
-        print('*AVH-Export: File exists: $filePath');
+        print('*AVH-Export: File exists: ${file.path}');
         String content = await file.readAsString();
         print('*AVH-Export: File content: $content');
 
-        Share.shareFiles([file.path], text: 'Here are my PadelShooter programs.');
+        Share.shareXFiles([XFile(file.path)], text: 'Here are my PadelShooter programs.');
         print('*AVH-Export: Share dialog opened');
       } else {
         print('*AVH-Export: File not found');
@@ -303,19 +304,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _importPrograms() async {
     print('*AVH-Import: Import Programs button pressed');
-    if (Platform.isAndroid) {
-      var status = await Permission.manageExternalStorage.status;
-      if (!status.isGranted) {
-        print('*AVH-Import: Storage permission not granted. Cannot import programs.');
-        await _requestPermissions();
-        return;
-      }
+    var status = await Permission.manageExternalStorage.status;
+    if (!status.isGranted) {
+      print('*AVH-Import: Storage permission not granted. Cannot import programs.');
+      await _requestPermissions();
+      return;
     }
 
     try {
-      final filePath = await _getFilePath('programs.json');
-      final file = File(filePath);
-      print('*AVH-Import: File path: $filePath');
+      final downloadsDirectory = Directory('/storage/emulated/0/Download');
+      print('*AVH-Import: Downloads directory: ${downloadsDirectory.path}');
+      if (downloadsDirectory == null) {
+        print('*AVH-Import: Downloads directory is null');
+        return;
+      }
+
+      final file = File('${downloadsDirectory.path}/programs.json');
+      print('*AVH-Import: File path: ${file.path}');
 
       if (await file.exists()) {
         String content = await file.readAsString();
@@ -396,8 +401,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
       print('Could not launch $url');
     }
