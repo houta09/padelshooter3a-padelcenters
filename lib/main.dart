@@ -13,13 +13,6 @@ import 'utils/bluetooth_manager.dart';
 import 'utils/app_localizations.dart';
 import 'dart:convert';
 
-Future<void> clearArabicLanguagePreference() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  if (prefs.getString('language_code') == 'ar') {
-    await prefs.remove('language_code');
-  }
-}
-
 Future<void> _importSettingsFromWeb() async {
   print('*AVH-Import: Import from Web function called');
   try {
@@ -53,6 +46,7 @@ Future<void> _importSettingsFromWeb() async {
       }
 
       print('*AVH-Import: Settings imported successfully from web');
+      await prefs.setBool('settings_imported', true);
     } else {
       print('*AVH-Import: Error fetching settings from web. Status code: ${response.statusCode}');
     }
@@ -60,10 +54,18 @@ Future<void> _importSettingsFromWeb() async {
     print('*AVH-Import: Error importing settings from web: $e');
   }
 }
+/*
+Future<void> clearArabicLanguagePreference() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (prefs.getString('language_code') == 'ar') {
+    await prefs.remove('language_code');
+  }
+}
+*/
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await clearArabicLanguagePreference();
+//  await clearArabicLanguagePreference();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) async {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky); // Full-screen mode
@@ -78,8 +80,11 @@ void main() async {
     }
 
     print('*AVH-lang-m: Initial language code from preferences: $languageCode');
-
-    await _importSettingsFromWeb();
+    // Check if settings have already been imported
+    bool settingsImported = prefs.getBool('settings_imported') ?? false;
+    if (!settingsImported) {
+      await _importSettingsFromWeb();
+    }
 
     runApp(PadelShooterApp(initialLocale: Locale(languageCode)));
   });
@@ -332,3 +337,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
     );
   }
 }
+
+
+
+
