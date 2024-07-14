@@ -10,6 +10,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'package:file_picker/file_picker.dart';
 import '../utils/bluetooth_manager.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -70,10 +71,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _requestPermissions() async {
     print('*AVH-Export: Requesting storage permission');
-    PermissionStatus status = await Permission.manageExternalStorage.status;
+    PermissionStatus status = await Permission.storage.status;
     print('*AVH-Export: Initial permission status: $status');
-    if (status.isDenied) {
-      status = await Permission.manageExternalStorage.request();
+    if (status.isDenied || status.isPermanentlyDenied) {
+      status = await Permission.storage.request();
       print('*AVH-Export: Requested permission status: $status');
     }
     if (status.isGranted) {
@@ -115,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportSettings() async {
     print('*AVH-Export: Export button pressed');
-    var status = await Permission.manageExternalStorage.status;
+    var status = await Permission.storage.status;
     if (!status.isGranted) {
       print('*AVH-Export: Storage permission not granted. Cannot export settings.');
       await _requestPermissions();
@@ -130,14 +131,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     print('*AVH-Export: Settings to export: $allSettings');
 
     try {
-      final downloadsDirectory = Directory('/storage/emulated/0/Download');
-      print('*AVH-Export: Downloads directory: ${downloadsDirectory.path}');
-      if (downloadsDirectory == null) {
-        print('*AVH-Export: Downloads directory is null');
+      final directory = Platform.isAndroid
+          ? Directory('/storage/emulated/0/Download')
+          : await getApplicationDocumentsDirectory();
+
+      print('*AVH-Export: Directory: ${directory.path}');
+      if (directory == null) {
+        print('*AVH-Export: Directory is null');
         return;
       }
 
-      final file = File('${downloadsDirectory.path}/training_settings.json');
+      final file = File('${directory.path}/training_settings.json');
       print('*AVH-Export: File path: ${file.path}');
 
       await file.create(recursive: true);
@@ -148,7 +152,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         String content = await file.readAsString();
         print('*AVH-Export: File content: $content');
 
-        Share.shareXFiles([XFile(file.path)], text: 'Here are my PadelShooter settings.');
+        await Share.shareXFiles([XFile(file.path)], text: 'Here are my PadelShooter settings.');
         print('*AVH-Export: Share dialog opened');
       } else {
         print('*AVH-Export: File not found');
@@ -160,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _importSettings() async {
     print('*AVH-Import: Import button pressed');
-    var status = await Permission.manageExternalStorage.status;
+    var status = await Permission.storage.status;
     if (!status.isGranted) {
       print('*AVH-Import: Storage permission not granted. Cannot import settings.');
       await _requestPermissions();
@@ -168,29 +172,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     try {
-      final downloadsDirectory = Directory('/storage/emulated/0/Download');
-      print('*AVH-Import: Downloads directory: ${downloadsDirectory.path}');
-      if (downloadsDirectory == null) {
-        print('*AVH-Import: Downloads directory is null');
-        return;
-      }
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
 
-      final file = File('${downloadsDirectory.path}/training_settings.json');
-      print('*AVH-Import: File path: ${file.path}');
+      if (result != null) {
+        File file = File(result.files.single.path!);
+        print('*AVH-Import: File path: ${file.path}');
 
-      if (await file.exists()) {
-        String content = await file.readAsString();
-        print('*AVH-Import: File content: $content');
-        Map<String, dynamic> allSettings = json.decode(content);
+        if (await file.exists()) {
+          String content = await file.readAsString();
+          print('*AVH-Import: File content: $content');
+          Map<String, dynamic> allSettings = json.decode(content);
 
-        for (int i = 1; i <= 9; i++) {
-          await _setTrainingSettings('StartHere', i, allSettings['StartHere_training_$i']);
-          await _setTrainingSettings('Trainings', i, allSettings['Trainings_training_$i']);
+          for (int i = 1; i <= 9; i++) {
+            await _setTrainingSettings('StartHere', i, allSettings['StartHere_training_$i']);
+            await _setTrainingSettings('Trainings', i, allSettings['Trainings_training_$i']);
+          }
+
+          print('*AVH-Import: Settings imported successfully');
+        } else {
+          print('*AVH-Import: File not found');
         }
-
-        print('*AVH-Import: Settings imported successfully');
-      } else {
-        print('*AVH-Import: File not found');
       }
     } catch (e) {
       print('*AVH-Import: Error importing settings: $e');
@@ -229,18 +233,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
           await prefs.setBool('Trainings_RightSelected_$i', settings['Trainings_training_$i']['RightSelected'] as bool);
         }
 
-          print('*AVH-Import: Settings imported successfully from web');
-              } else {
-              print('*AVH-Import: Error fetching settings from web. Status code: ${response.statusCode}');
-              }
-          } catch (e) {
-            print('*AVH-Import: Error importing settings from web: $e');
-          }
-        }
+        print('*AVH-Import: Settings imported successfully from web');
+      } else {
+        print('*AVH-Import: Error fetching settings from web. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('*AVH-Import: Error importing settings from web: $e');
+    }
+  }
 
   Future<void> _exportPrograms() async {
     print('*AVH-Export: Export Programs button pressed');
-    var status = await Permission.manageExternalStorage.status;
+    var status = await Permission.storage.status;
     if (!status.isGranted) {
       print('*AVH-Export: Storage permission not granted. Cannot export programs.');
       await _requestPermissions();
@@ -274,14 +278,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     print('*AVH-Export: Programs to export: $allPrograms');
 
     try {
-      final downloadsDirectory = Directory('/storage/emulated/0/Download');
-      print('*AVH-Export: Downloads directory: ${downloadsDirectory.path}');
-      if (downloadsDirectory == null) {
-        print('*AVH-Export: Downloads directory is null');
+      final directory = Platform.isAndroid
+          ? Directory('/storage/emulated/0/Download')
+          : await getApplicationDocumentsDirectory();
+
+      print('*AVH-Export: Directory: ${directory.path}');
+      if (directory == null) {
+        print('*AVH-Export: Directory is null');
         return;
       }
 
-      final file = File('${downloadsDirectory.path}/programs.json');
+      final file = File('${directory.path}/programs.json');
       print('*AVH-Export: File path: ${file.path}');
 
       await file.create(recursive: true);
@@ -292,7 +299,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         String content = await file.readAsString();
         print('*AVH-Export: File content: $content');
 
-        Share.shareXFiles([XFile(file.path)], text: 'Here are my PadelShooter programs.');
+        await Share.shareXFiles([XFile(file.path)], text: 'Here are my PadelShooter programs.');
         print('*AVH-Export: Share dialog opened');
       } else {
         print('*AVH-Export: File not found');
@@ -304,7 +311,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _importPrograms() async {
     print('*AVH-Import: Import Programs button pressed');
-    var status = await Permission.manageExternalStorage.status;
+    var status = await Permission.storage.status;
     if (!status.isGranted) {
       print('*AVH-Import: Storage permission not granted. Cannot import programs.');
       await _requestPermissions();
@@ -312,47 +319,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     try {
-      final downloadsDirectory = Directory('/storage/emulated/0/Download');
-      print('*AVH-Import: Downloads directory: ${downloadsDirectory.path}');
-      if (downloadsDirectory == null) {
-        print('*AVH-Import: Downloads directory is null');
-        return;
-      }
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
 
-      final file = File('${downloadsDirectory.path}/programs.json');
-      print('*AVH-Import: File path: ${file.path}');
+      if (result != null) {
+        File file = File(result.files.single.path!);
+        print('*AVH-Import: File path: ${file.path}');
 
-      if (await file.exists()) {
-        String content = await file.readAsString();
-        print('*AVH-Import: File content: $content');
-        Map<String, dynamic> allPrograms = json.decode(content);
-        SharedPreferences prefs = await SharedPreferences.getInstance();
+        if (await file.exists()) {
+          String content = await file.readAsString();
+          print('*AVH-Import: File content: $content');
+          Map<String, dynamic> allPrograms = json.decode(content);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        List<String> categories = [];
-        for (String category in allPrograms.keys) {
-          categories.add(category); // Add category to the list
-          List<String> programs = [];
-          for (String program in allPrograms[category].keys) {
-            programs.add(program);
-            Map<String, dynamic> programData = allPrograms[category][program];
-            int shotCount = programData["shotCount"];
-            prefs.setInt('${category}_${program}_ShotCount', shotCount);
+          List<String> categories = [];
+          for (String category in allPrograms.keys) {
+            categories.add(category); // Add category to the list
+            List<String> programs = [];
+            for (String program in allPrograms[category].keys) {
+              programs.add(program);
+              Map<String, dynamic> programData = allPrograms[category][program];
+              int shotCount = programData["shotCount"];
+              prefs.setInt('${category}_${program}_ShotCount', shotCount);
 
-            for (int i = 0; i < shotCount; i++) {
-              Map<String, int> shot = Map<String, int>.from(programData["shots"][i]);
-              prefs.setInt('${category}_${program}_Speed_$i', shot["Speed"]!);
-              prefs.setInt('${category}_${program}_Spin_$i', shot["Spin"]!);
-              prefs.setInt('${category}_${program}_Freq_$i', shot["Freq"]!);
-              prefs.setInt('${category}_${program}_Width_$i', shot["Width"]!);
-              prefs.setInt('${category}_${program}_Height_$i', shot["Height"]!);
+              for (int i = 0; i < shotCount; i++) {
+                Map<String, int> shot = Map<String, int>.from(programData["shots"][i]);
+                prefs.setInt('${category}_${program}_Speed_$i', shot["Speed"]!);
+                prefs.setInt('${category}_${program}_Spin_$i', shot["Spin"]!);
+                prefs.setInt('${category}_${program}_Freq_$i', shot["Freq"]!);
+                prefs.setInt('${category}_${program}_Width_$i', shot["Width"]!);
+                prefs.setInt('${category}_${program}_Height_$i', shot["Height"]!);
+              }
             }
+            prefs.setStringList('programs_$category', programs);
           }
-          prefs.setStringList('programs_$category', programs);
+          prefs.setStringList('categories', categories); // Save categories
+          print('*AVH-Import: Programs and categories imported successfully');
+        } else {
+          print('*AVH-Import: File not found');
         }
-        prefs.setStringList('categories', categories); // Save categories
-        print('*AVH-Import: Programs and categories imported successfully');
-      } else {
-        print('*AVH-Import: File not found');
       }
     } catch (e) {
       print('*AVH-Import: Error importing programs: $e');
