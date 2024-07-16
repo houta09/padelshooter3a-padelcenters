@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import '../utils/bluetooth_manager.dart';
+import 'package:cross_file/cross_file.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Function(int) onNavigate;
@@ -71,34 +72,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _requestPermissions() async {
     print('*AVH-Export: Requesting storage permission');
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.storage,
-      Permission.manageExternalStorage,
-    ].request();
 
-    PermissionStatus status = statuses[Permission.storage] ?? PermissionStatus.denied;
-    PermissionStatus manageStatus = statuses[Permission.manageExternalStorage] ?? PermissionStatus.denied;
-
-    print('*AVH-Export: Initial permission status: $status');
-    print('*AVH-Export: Manage storage permission status: $manageStatus');
-
-    if (status.isDenied || manageStatus.isDenied || status.isPermanentlyDenied || manageStatus.isPermanentlyDenied) {
-      statuses = await [
+    if(Platform.isAndroid) {
+      var status = await Permission.manageExternalStorage.status;
+      if (!status.isGranted) {
+        status = await Permission.manageExternalStorage.request();
+        print('*AVH-Export: Storage permission requested. New status: $status');
+      }
+      if (status.isGranted) {
+        print('*AVH-Export: Storage permission granted.');
+      } else {
+        print('*AVH-Export: Storage permission not granted.');
+      }
+    } else {
+      Map<Permission, PermissionStatus> statuses = await [
         Permission.storage,
         Permission.manageExternalStorage,
       ].request();
-      status = statuses[Permission.storage] ?? PermissionStatus.denied;
-      manageStatus = statuses[Permission.manageExternalStorage] ?? PermissionStatus.denied;
-      print('*AVH-Export: Requested permission status: $status');
-      print('*AVH-Export: Requested manage storage permission status: $manageStatus');
+
+      PermissionStatus status = statuses[Permission.storage] ?? PermissionStatus.denied;
+      PermissionStatus manageStatus = statuses[Permission.manageExternalStorage] ?? PermissionStatus.denied;
+
+      print('*AVH-Export: Initial permission status: $status');
+      print('*AVH-Export: Manage storage permission status: $manageStatus');
+
+      if (status.isDenied || manageStatus.isDenied || status.isPermanentlyDenied || manageStatus.isPermanentlyDenied) {
+        statuses = await [
+          Permission.storage,
+          Permission.manageExternalStorage,
+        ].request();
+        status = statuses[Permission.storage] ?? PermissionStatus.denied;
+        manageStatus = statuses[Permission.manageExternalStorage] ?? PermissionStatus.denied;
+        print('*AVH-Export: Requested permission status: $status');
+        print('*AVH-Export: Requested manage storage permission status: $manageStatus');
+      }
+
+      if (status.isGranted && manageStatus.isGranted) {
+        print('*AVH-Export: Storage permission granted.');
+      } else {
+        print('*AVH-Export: Storage permission not granted. Status: $status');
+        print('*AVH-Export: Manage storage permission not granted. Status: $manageStatus');
+      }
     }
 
-    if (status.isGranted && manageStatus.isGranted) {
-      print('*AVH-Export: Storage permission granted.');
-    } else {
-      print('*AVH-Export: Storage permission not granted. Status: $status');
-      print('*AVH-Export: Manage storage permission not granted. Status: $manageStatus');
-    }
   }
 
   Future<Map<String, dynamic>> _getTrainingSettings(String prefix, int trainingIndex) async {
