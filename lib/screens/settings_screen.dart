@@ -71,16 +71,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _requestPermissions() async {
     print('*AVH-Export: Requesting storage permission');
-    PermissionStatus status = await Permission.storage.status;
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.storage,
+      Permission.manageExternalStorage,
+    ].request();
+
+    PermissionStatus status = statuses[Permission.storage] ?? PermissionStatus.denied;
+    PermissionStatus manageStatus = statuses[Permission.manageExternalStorage] ?? PermissionStatus.denied;
+
     print('*AVH-Export: Initial permission status: $status');
-    if (status.isDenied || status.isPermanentlyDenied) {
-      status = await Permission.storage.request();
+    print('*AVH-Export: Manage storage permission status: $manageStatus');
+
+    if (status.isDenied || manageStatus.isDenied || status.isPermanentlyDenied || manageStatus.isPermanentlyDenied) {
+      statuses = await [
+        Permission.storage,
+        Permission.manageExternalStorage,
+      ].request();
+      status = statuses[Permission.storage] ?? PermissionStatus.denied;
+      manageStatus = statuses[Permission.manageExternalStorage] ?? PermissionStatus.denied;
       print('*AVH-Export: Requested permission status: $status');
+      print('*AVH-Export: Requested manage storage permission status: $manageStatus');
     }
-    if (status.isGranted) {
+
+    if (status.isGranted && manageStatus.isGranted) {
       print('*AVH-Export: Storage permission granted.');
     } else {
       print('*AVH-Export: Storage permission not granted. Status: $status');
+      print('*AVH-Export: Manage storage permission not granted. Status: $manageStatus');
     }
   }
 
@@ -116,10 +133,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportSettings() async {
     print('*AVH-Export: Export button pressed');
+    await _requestPermissions(); // Ensure permissions are checked each time
+
     var status = await Permission.storage.status;
     if (!status.isGranted) {
       print('*AVH-Export: Storage permission not granted. Cannot export settings.');
-      await _requestPermissions();
       return;
     }
 
@@ -164,10 +182,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _importSettings() async {
     print('*AVH-Import: Import button pressed');
+    await _requestPermissions(); // Ensure permissions are checked each time
+
     var status = await Permission.storage.status;
     if (!status.isGranted) {
       print('*AVH-Import: Storage permission not granted. Cannot import settings.');
-      await _requestPermissions();
       return;
     }
 
@@ -244,10 +263,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportPrograms() async {
     print('*AVH-Export: Export Programs button pressed');
+    await _requestPermissions(); // Ensure permissions are checked each time
+
     var status = await Permission.storage.status;
     if (!status.isGranted) {
       print('*AVH-Export: Storage permission not granted. Cannot export programs.');
-      await _requestPermissions();
       return;
     }
 
@@ -311,10 +331,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _importPrograms() async {
     print('*AVH-Import: Import Programs button pressed');
+    await _requestPermissions(); // Ensure permissions are checked each time
+
     var status = await Permission.storage.status;
     if (!status.isGranted) {
       print('*AVH-Import: Storage permission not granted. Cannot import programs.');
-      await _requestPermissions();
       return;
     }
 
