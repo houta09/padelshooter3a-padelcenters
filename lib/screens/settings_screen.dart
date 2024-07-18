@@ -149,12 +149,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportSettings() async {
     print('*AVH-Export: Export button pressed');
-    await _requestPermissions(); // Ensure permissions are checked each time
-
-    var status = await Permission.storage.status;
+    var status = await Permission.manageExternalStorage.status;
     if (!status.isGranted) {
       print('*AVH-Export: Storage permission not granted. Cannot export settings.');
       return;
+    }
+    else {
+      print('*AVH-Export: Storage permission is granted. Haleluja.');
     }
 
     Map<String, dynamic> allSettings = {};
@@ -279,12 +280,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportPrograms() async {
     print('*AVH-Export: Export Programs button pressed');
-    await _requestPermissions(); // Ensure permissions are checked each time
-
-    var status = await Permission.storage.status;
+    var status = await Permission.manageExternalStorage.status;
     if (!status.isGranted) {
       print('*AVH-Export: Storage permission not granted. Cannot export programs.');
       return;
+    }
+    else {
+      print('*AVH-Export: Storage permission granted. Haleluja.');
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
