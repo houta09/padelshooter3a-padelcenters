@@ -76,7 +76,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Save the program name in the selected category
     List<String> programs = prefs.getStringList('programs_${_selectedCategory!}') ?? [];
     if (!programs.contains(_programNameController.text)) {
       programs.add(_programNameController.text);
@@ -85,7 +84,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
     for (int i = 0; i < _currentShotCount; i++) {
       prefs.setInt("${_selectedCategory!}_${_programNameController.text}_Speed_$i", int.parse(_shots[i]["Speed"]!.text));
-      prefs.setInt("${_selectedCategory!}_${_programNameController.text}_Spin_$i", int.parse(_shots[i]["Spin"]!.text) + 50);
+      prefs.setInt("${_selectedCategory!}_${_programNameController.text}_Spin_$i", int.parse(_shots[i]["Spin"]!.text));
       prefs.setInt("${_selectedCategory!}_${_programNameController.text}_Freq_$i", int.parse(_shots[i]["Freq"]!.text));
       prefs.setInt("${_selectedCategory!}_${_programNameController.text}_Width_$i", int.parse(_shots[i]["Width"]!.text));
       prefs.setInt("${_selectedCategory!}_${_programNameController.text}_Height_$i", int.parse(_shots[i]["Height"]!.text));
@@ -104,7 +103,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     });
     for (int i = 0; i < _currentShotCount; i++) {
       _shots[i]["Speed"]!.text = (prefs.getInt("${_selectedCategory!}_${programName}_Speed_$i") ?? 0).toString();
-      _shots[i]["Spin"]!.text = ((prefs.getInt("${_selectedCategory!}_${programName}_Spin_$i") ?? 50) - 50).toString();
+      _shots[i]["Spin"]!.text = ((prefs.getInt("${_selectedCategory!}_${programName}_Spin_$i") ?? 0)).toString();
       _shots[i]["Freq"]!.text = (prefs.getInt("${_selectedCategory!}_${programName}_Freq_$i") ?? 0).toString();
       _shots[i]["Width"]!.text = (prefs.getInt("${_selectedCategory!}_${programName}_Width_$i") ?? 0).toString();
       _shots[i]["Height"]!.text = (prefs.getInt("${_selectedCategory!}_${programName}_Height_$i") ?? 0).toString();
@@ -135,7 +134,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     for (int i = 0; i < _currentShotCount; i++) {
       List<int> shot = [
         int.parse(_shots[i]["Speed"]!.text),
-        int.parse(_shots[i]["Spin"]!.text) + 50,
+        int.parse(_shots[i]["Spin"]!.text),
         int.parse(_shots[i]["Freq"]!.text),
         int.parse(_shots[i]["Width"]!.text),
         int.parse(_shots[i]["Height"]!.text),
@@ -147,6 +146,9 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String mode = prefs.getString('selected_mode') ?? 'Padel';
     int maxSpeed = mode == 'Tennis' ? 250 : 100;
+
+
+
 
     await _bluetoothManager?.sendProgramToPadelshooter(program, maxSpeed);
     print('*AVH: Program played: ${_programNameController.text}');
@@ -602,8 +604,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: _selectedShotIndex != -1 && _isCopyShotButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('copyshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
-
+                        child: Text(AppLocalizations.of(context).translate('copyshot') ?? 'Copy Shot', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),

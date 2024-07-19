@@ -121,7 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return {
       "Speed": prefs.getInt("${prefix}_Speed_$trainingIndex") ?? 15,
-      "Spin": 50 - (prefs.getInt("${prefix}_Spin_$trainingIndex") ?? 50),
+      "Spin": prefs.getInt("${prefix}_Spin_$trainingIndex") ?? 0, // Read directly
       "Freq": prefs.getInt("${prefix}_Freq_$trainingIndex") ?? 40,
       "Width": prefs.getInt("${prefix}_Width_$trainingIndex") ?? 100,
       "Height": prefs.getInt("${prefix}_Height_$trainingIndex") ?? 40,
@@ -135,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _setTrainingSettings(String prefix, int trainingIndex, Map<String, dynamic> settings) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt("${prefix}_Speed_$trainingIndex", settings["Speed"] as int);
-    await prefs.setInt("${prefix}_Spin_$trainingIndex", 50 - (settings["Spin"] as int));
+    await prefs.setInt("${prefix}_Spin_$trainingIndex", settings["Spin"] as int); // Store directly
     await prefs.setInt("${prefix}_Freq_$trainingIndex", settings["Freq"] as int);
     await prefs.setInt("${prefix}_Width_$trainingIndex", settings["Width"] as int);
     await prefs.setInt("${prefix}_Height_$trainingIndex", settings["Height"] as int);
@@ -150,6 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _exportSettings() async {
     print('*AVH-Export: Export button pressed');
     var status = await Permission.manageExternalStorage.status;
+    await Future.delayed(const Duration(milliseconds: 500));
     if (!status.isGranted) {
       print('*AVH-Export: Storage permission not granted. Cannot export settings.');
       return;
@@ -249,7 +250,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
         for (int i = 1; i <= 9; i++) {
           await prefs.setInt('StartHere_Speed_$i', settings['StartHere_training_$i']['Speed'] as int);
-          await prefs.setInt('StartHere_Spin_$i', 50 - (settings['StartHere_training_$i']['Spin'] as int));
+          await prefs.setInt('StartHere_Spin_$i', settings['StartHere_training_$i']['Spin'] as int);
           await prefs.setInt('StartHere_Freq_$i', settings['StartHere_training_$i']['Freq'] as int);
           await prefs.setInt('StartHere_Width_$i', settings['StartHere_training_$i']['Width'] as int);
           await prefs.setInt('StartHere_Height_$i', settings['StartHere_training_$i']['Height'] as int);
@@ -259,7 +260,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           await prefs.setBool('StartHere_RightSelected_$i', settings['StartHere_training_$i']['RightSelected'] as bool);
 
           await prefs.setInt('Trainings_Speed_$i', settings['Trainings_training_$i']['Speed'] as int);
-          await prefs.setInt('Trainings_Spin_$i', 50 - (settings['Trainings_training_$i']['Spin'] as int));
+          await prefs.setInt('Trainings_Spin_$i', settings['Trainings_training_$i']['Spin'] as int);
           await prefs.setInt('Trainings_Freq_$i', settings['Trainings_training_$i']['Freq'] as int);
           await prefs.setInt('Trainings_Width_$i', settings['Trainings_training_$i']['Width'] as int);
           await prefs.setInt('Trainings_Height_$i', settings['Trainings_training_$i']['Height'] as int);
@@ -278,14 +279,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+
   Future<void> _exportPrograms() async {
     print('*AVH-Export: Export Programs button pressed');
     var status = await Permission.manageExternalStorage.status;
+    await Future.delayed(const Duration(milliseconds: 500));
     if (!status.isGranted) {
       print('*AVH-Export: Storage permission not granted. Cannot export programs.');
       return;
-    }
-    else {
+    } else {
       print('*AVH-Export: Storage permission granted. Haleluja.');
     }
 
@@ -304,7 +306,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         for (int i = 0; i < shotCount; i++) {
           Map<String, int> shot = {
             "Speed": prefs.getInt('${category}_${program}_Speed_$i') ?? 0,
-            "Spin": prefs.getInt('${category}_${program}_Spin_$i') ?? 0,
+            "Spin": prefs.getInt('${category}_${program}_Spin_$i') ?? 0, // No adjustment needed
             "Freq": prefs.getInt('${category}_${program}_Freq_$i') ?? 0,
             "Width": prefs.getInt('${category}_${program}_Width_$i') ?? 0,
             "Height": prefs.getInt('${category}_${program}_Height_$i') ?? 0,
@@ -459,7 +461,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await _bluetoothManager.sendCommandToPadelshooter(
         command: 10,
         speed: 14,
-        spin: 50,
+        spin: 0,
         freq: 40,
         width: width,
         height: 40,

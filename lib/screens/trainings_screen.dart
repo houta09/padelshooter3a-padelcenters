@@ -57,7 +57,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _controllers["Speed"]?.text = (prefs.getInt("Trainings_Speed_$trainingIndex") ?? 15).toString();
-      _controllers["Spin"]?.text = (50 - (prefs.getInt("Trainings_Spin_$trainingIndex") ?? 50)).toString();
+      _controllers["Spin"]?.text = ((prefs.getInt("Trainings_Spin_$trainingIndex") ?? 50) - 50).toString();
       _controllers["Freq"]?.text = (prefs.getInt("Trainings_Freq_$trainingIndex") ?? 40).toString();
       _controllers["Width"]?.text = (prefs.getInt("Trainings_Width_$trainingIndex") ?? 100).toString();
       _controllers["Height"]?.text = (prefs.getInt("Trainings_Height_$trainingIndex") ?? 40).toString();
@@ -75,7 +75,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
   Future<void> _saveSettings(int trainingIndex) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt("Trainings_Speed_$trainingIndex", int.parse(_controllers["Speed"]!.text));
-    await prefs.setInt("Trainings_Spin_$trainingIndex", 50 - int.parse(_controllers["Spin"]!.text));
+    await prefs.setInt("Trainings_Spin_$trainingIndex", int.parse(_controllers["Spin"]!.text) + 50);
     await prefs.setInt("Trainings_Freq_$trainingIndex", int.parse(_controllers["Freq"]!.text));
     await prefs.setInt("Trainings_Width_$trainingIndex", int.parse(_controllers["Width"]!.text));
     await prefs.setInt("Trainings_Height_$trainingIndex", int.parse(_controllers["Height"]!.text));
@@ -265,7 +265,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
               startSpeed: 100,
               speedFactor: 9,
               speed: int.parse(_controllers["Speed"]!.text),
-              spin: 50 - int.parse(_controllers["Spin"]!.text),
+              spin: int.parse(_controllers["Spin"]!.text),
               freq: int.parse(_controllers["Freq"]!.text),
               width: int.parse(_controllers["Width"]!.text),
               height: int.parse(_controllers["Height"]!.text),

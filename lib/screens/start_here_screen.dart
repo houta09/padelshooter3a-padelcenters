@@ -50,11 +50,12 @@ class _StartHereScreenState extends State<StartHereScreen> {
     print('*AVH: StartHereScreen initialized with training index: $_currentTrainingIndex');
   }
 
+
   Future<void> _loadSettings(int trainingIndex) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _controllers["Speed"]?.text = (prefs.getInt("StartHere_Speed_$trainingIndex") ?? 15).toString();
-      _controllers["Spin"]?.text = (50 - (prefs.getInt("StartHere_Spin_$trainingIndex") ?? 50)).toString();
+      _controllers["Spin"]?.text = ((prefs.getInt("StartHere_Spin_$trainingIndex") ?? 50) - 50).toString();
       _controllers["Freq"]?.text = (prefs.getInt("StartHere_Freq_$trainingIndex") ?? 40).toString();
       _controllers["Width"]?.text = (prefs.getInt("StartHere_Width_$trainingIndex") ?? 100).toString();
       _controllers["Height"]?.text = (prefs.getInt("StartHere_Height_$trainingIndex") ?? 40).toString();
@@ -68,7 +69,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
   Future<void> _saveSettings(int trainingIndex) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt("StartHere_Speed_$trainingIndex", int.parse(_controllers["Speed"]!.text));
-    await prefs.setInt("StartHere_Spin_$trainingIndex", 50 - int.parse(_controllers["Spin"]!.text));
+    await prefs.setInt("StartHere_Spin_$trainingIndex", int.parse(_controllers["Spin"]!.text) + 50);
     await prefs.setInt("StartHere_Freq_$trainingIndex", int.parse(_controllers["Freq"]!.text));
     await prefs.setInt("StartHere_Width_$trainingIndex", int.parse(_controllers["Width"]!.text));
     await prefs.setInt("StartHere_Height_$trainingIndex", int.parse(_controllers["Height"]!.text));
@@ -170,7 +171,6 @@ class _StartHereScreenState extends State<StartHereScreen> {
               SafeArea(
                 child: Column(
                   children: [
-                    // SizedBox(height: 50), // Add extra space above
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
@@ -227,6 +227,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
             });
             var fieldValues = _getFieldValues();
             int maxSpeed = await _getMaxSpeed();
+
             bluetoothManager.sendCommandToPadelshooter(
               command: 10,
               maxSpeed: maxSpeed,
@@ -236,7 +237,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
               startSpeed: 100,
               speedFactor: 9,
               speed: int.parse(_controllers["Speed"]!.text),
-              spin: 50 - int.parse(_controllers["Spin"]!.text),
+              spin: int.parse(_controllers["Spin"]!.text),
               freq: int.parse(_controllers["Freq"]!.text),
               width: int.parse(_controllers["Width"]!.text),
               height: int.parse(_controllers["Height"]!.text),

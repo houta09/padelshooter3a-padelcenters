@@ -136,7 +136,7 @@ class BluetoothManager extends ChangeNotifier {
     int startSpeed = 100,
     int speedFactor = 9,
     int speed = 15,
-    int spin = 50,
+    int spin = 0,
     int freq = 40,
     int width = 100,
     int height = 30,
@@ -147,7 +147,7 @@ class BluetoothManager extends ChangeNotifier {
   }) async {
     List<int> intData = [
       command, maxSpeed, delayLevel, hmin, hmax, startSpeed, speedFactor,
-      speed, spin, freq, width, height, training, net, generalInfo, endByte
+      speed, convertSpinValue(spin), freq, width, height, training, net, generalInfo, endByte
     ];
     if (!isConnected) await connect(device);
     await sendData(intData, serviceUUID, characteristicUUID);
@@ -157,6 +157,7 @@ class BluetoothManager extends ChangeNotifier {
     List<int> intData = [11, maxSpeed, 0, 0, 100, 100, 9, 0];
     for (var shot in program) {
       if (shot.any((value) => value != 0)) {
+        shot[1] = convertSpinValue(shot[1]); // Convert spin value
         intData.addAll(shot);
         intData.add(254);
       }
@@ -171,4 +172,8 @@ class BluetoothManager extends ChangeNotifier {
     _reconnectionTimer?.cancel();
     super.dispose();
   }
+}
+
+int convertSpinValue(int spin) {
+  return ((-1*spin) + 50); // Convert spin from -50..50 to 0..100
 }
