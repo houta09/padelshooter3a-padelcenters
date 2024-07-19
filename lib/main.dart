@@ -25,7 +25,7 @@ Future<void> _importSettingsFromWeb() async {
 
       for (int i = 1; i <= 9; i++) {
         await prefs.setInt("StartHere_Speed_$i", settings['StartHere_training_$i']["Speed"] as int);
-        await prefs.setInt("StartHere_Spin_$i", 50 - (settings['StartHere_training_$i']["Spin"] as int));
+        await prefs.setInt("StartHere_Spin_$i", settings['StartHere_training_$i']["Spin"] as int);
         await prefs.setInt("StartHere_Freq_$i", settings['StartHere_training_$i']["Freq"] as int);
         await prefs.setInt("StartHere_Width_$i", settings['StartHere_training_$i']["Width"] as int);
         await prefs.setInt("StartHere_Height_$i", settings['StartHere_training_$i']["Height"] as int);
@@ -35,7 +35,7 @@ Future<void> _importSettingsFromWeb() async {
         await prefs.setBool("StartHere_RightSelected_$i", settings['StartHere_training_$i']["RightSelected"] as bool);
 
         await prefs.setInt("Trainings_Speed_$i", settings['Trainings_training_$i']["Speed"] as int);
-        await prefs.setInt("Trainings_Spin_$i", 50 - (settings['Trainings_training_$i']["Spin"] as int));
+        await prefs.setInt("Trainings_Spin_$i", settings['Trainings_training_$i']["Spin"] as int);
         await prefs.setInt("Trainings_Freq_$i", settings['Trainings_training_$i']["Freq"] as int);
         await prefs.setInt("Trainings_Width_$i", settings['Trainings_training_$i']["Width"] as int);
         await prefs.setInt("Trainings_Height_$i", settings['Trainings_training_$i']["Height"] as int);
@@ -84,6 +84,7 @@ void main() async {
     bool settingsImported = prefs.getBool('settings_imported') ?? false;
     if (!settingsImported) {
       await _importSettingsFromWeb();
+      print('*AVH-import settings from Web');
     }
 
     runApp(PadelShooterApp(initialLocale: Locale(languageCode)));

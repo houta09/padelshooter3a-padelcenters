@@ -114,7 +114,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         print('*AVH-Export: Manage storage permission not granted. Status: $manageStatus');
       }
     }
-
   }
 
   Future<Map<String, dynamic>> _getTrainingSettings(String prefix, int trainingIndex) async {
@@ -290,70 +289,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportPrograms() async {
     print('*AVH-Export: Export Programs button pressed');
-    var status = await Permission.manageExternalStorage.status;
-    await Future.delayed(const Duration(milliseconds: 500));
-    if (!status.isGranted) {
-      print('*AVH-Export: Storage permission not granted. Cannot export programs.');
-      return;
-    } else {
-      print('*AVH-Export: Storage permission granted. Haleluja.');
-    }
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Map<String, dynamic> allPrograms = {};
-    Set<String> categories = prefs.getKeys().where((key) => key.startsWith('programs_')).map((key) => key.split('_')[1]).toSet();
-
-    for (String category in categories) {
-      List<String> programs = prefs.getStringList('programs_$category') ?? [];
-      allPrograms[category] = {};
-
-      for (String program in programs) {
-        int shotCount = prefs.getInt('${category}_${program}_ShotCount') ?? 0;
-        allPrograms[category][program] = {"shotCount": shotCount, "shots": []};
-
-        for (int i = 0; i < shotCount; i++) {
-          Map<String, int> shot = {
-            "Speed": prefs.getInt('${category}_${program}_Speed_$i') ?? 0,
-            "Spin": prefs.getInt('${category}_${program}_Spin_$i') ?? 0, // No adjustment needed
-            "Freq": prefs.getInt('${category}_${program}_Freq_$i') ?? 0,
-            "Width": prefs.getInt('${category}_${program}_Width_$i') ?? 0,
-            "Height": prefs.getInt('${category}_${program}_Height_$i') ?? 0,
-          };
-          allPrograms[category][program]["shots"].add(shot);
-        }
-      }
-    }
-    print('*AVH-Export: Programs to export: $allPrograms');
-
-    try {
-      final directory = Platform.isAndroid
-          ? Directory('/storage/emulated/0/Download')
-          : await getApplicationDocumentsDirectory();
-
-      print('*AVH-Export: Directory: ${directory.path}');
-      if (directory == null) {
-        print('*AVH-Export: Directory is null');
+    if (Platform.isAndroid) {
+      var status = await Permission.manageExternalStorage.status;
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!status.isGranted) {
+        print(
+            '*AVH-Export: Storage permission not granted. Cannot export settings.');
         return;
       }
-
-      final file = File('${directory.path}/programs.json');
-      print('*AVH-Export: File path: ${file.path}');
-
-      await file.create(recursive: true);
-      await file.writeAsString(json.encode(allPrograms));
-
-      if (await file.exists()) {
-        print('*AVH-Export: File exists: ${file.path}');
-        String content = await file.readAsString();
-        print('*AVH-Export: File content: $content');
-
-        await Share.shareXFiles([XFile(file.path)], text: 'Here are my PadelShooter programs.');
-        print('*AVH-Export: Share dialog opened');
-      } else {
-        print('*AVH-Export: File not found');
+      else {
+        print('*AVH-Export: Storage permission is granted. Haleluja.');
       }
-    } catch (e) {
-      print('*AVH-Export: Error exporting programs: $e');
+    }
+    else {
+      // ios
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      Map<String, dynamic> allPrograms = {};
+      Set<String> categories = prefs.getKeys().where((key) =>
+          key.startsWith('programs_')).map((key) => key.split('_')[1]).toSet();
+
+      for (String category in categories) {
+        List<String> programs = prefs.getStringList('programs_$category') ?? [];
+        allPrograms[category] = {};
+
+        for (String program in programs) {
+          int shotCount = prefs.getInt('${category}_${program}_ShotCount') ?? 0;
+          allPrograms[category][program] =
+          {"shotCount": shotCount, "shots": []};
+
+          for (int i = 0; i < shotCount; i++) {
+            Map<String, int> shot = {
+              "Speed": prefs.getInt('${category}_${program}_Speed_$i') ?? 0,
+              "Spin": prefs.getInt('${category}_${program}_Spin_$i') ?? 0,
+              // No adjustment needed
+              "Freq": prefs.getInt('${category}_${program}_Freq_$i') ?? 0,
+              "Width": prefs.getInt('${category}_${program}_Width_$i') ?? 0,
+              "Height": prefs.getInt('${category}_${program}_Height_$i') ?? 0,
+            };
+            allPrograms[category][program]["shots"].add(shot);
+          }
+        }
+      }
+      print('*AVH-Export: Programs to export: $allPrograms');
+
+      try {
+        final directory = Platform.isAndroid
+            ? Directory('/storage/emulated/0/Download')
+            : await getApplicationDocumentsDirectory();
+
+        print('*AVH-Export: Directory: ${directory.path}');
+        if (directory == null) {
+          print('*AVH-Export: Directory is null');
+          return;
+        }
+
+        final file = File('${directory.path}/programs.json');
+        print('*AVH-Export: File path: ${file.path}');
+
+        await file.create(recursive: true);
+        await file.writeAsString(json.encode(allPrograms));
+
+        if (await file.exists()) {
+          print('*AVH-Export: File exists: ${file.path}');
+          String content = await file.readAsString();
+          print('*AVH-Export: File content: $content');
+
+          await Share.shareXFiles(
+              [XFile(file.path)], text: 'Here are my PadelShooter programs.');
+          print('*AVH-Export: Share dialog opened');
+        } else {
+          print('*AVH-Export: File not found');
+        }
+      } catch (e) {
+        print('*AVH-Export: Error exporting programs: $e');
+      }
     }
   }
 
