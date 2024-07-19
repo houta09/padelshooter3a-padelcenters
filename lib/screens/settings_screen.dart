@@ -162,6 +162,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     else {
       // ios
+    }
       Map<String, dynamic> allSettings = {};
       for (int i = 1; i <= 9; i++) {
         allSettings['StartHere_training_$i'] =
@@ -202,7 +203,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       } catch (e) {
         print('*AVH-Export: Error exporting settings: $e');
       }
-    }
   }
 
   Future<void> _importSettings() async {
@@ -303,6 +303,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     else {
       // ios
+    }
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Map<String, dynamic> allPrograms = {};
       Set<String> categories = prefs.getKeys().where((key) =>
@@ -363,7 +364,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       } catch (e) {
         print('*AVH-Export: Error exporting programs: $e');
       }
-    }
   }
 
   Future<void> _importPrograms() async {
