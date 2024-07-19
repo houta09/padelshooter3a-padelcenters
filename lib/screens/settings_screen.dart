@@ -149,52 +149,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportSettings() async {
     print('*AVH-Export: Export button pressed');
-    var status = await Permission.manageExternalStorage.status;
-    await Future.delayed(const Duration(milliseconds: 500));
-    if (!status.isGranted) {
-      print('*AVH-Export: Storage permission not granted. Cannot export settings.');
-      return;
-    }
-    else {
-      print('*AVH-Export: Storage permission is granted. Haleluja.');
-    }
-
-    Map<String, dynamic> allSettings = {};
-    for (int i = 1; i <= 9; i++) {
-      allSettings['StartHere_training_$i'] = await _getTrainingSettings('StartHere', i);
-      allSettings['Trainings_training_$i'] = await _getTrainingSettings('Trainings', i);
-    }
-    print('*AVH-Export: Settings to export: $allSettings');
-
-    try {
-      final directory = Platform.isAndroid
-          ? Directory('/storage/emulated/0/Download')
-          : await getApplicationDocumentsDirectory();
-
-      print('*AVH-Export: Directory: ${directory.path}');
-      if (directory == null) {
-        print('*AVH-Export: Directory is null');
+    if (Platform.isAndroid) {
+      var status = await Permission.manageExternalStorage.status;
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!status.isGranted) {
+        print(
+            '*AVH-Export: Storage permission not granted. Cannot export settings.');
         return;
       }
-
-      final file = File('${directory.path}/training_settings.json');
-      print('*AVH-Export: File path: ${file.path}');
-
-      await file.create(recursive: true);
-      await file.writeAsString(json.encode(allSettings));
-
-      if (await file.exists()) {
-        print('*AVH-Export: File exists: ${file.path}');
-        String content = await file.readAsString();
-        print('*AVH-Export: File content: $content');
-
-        await Share.shareXFiles([XFile(file.path)], text: 'Here are my PadelShooter settings.');
-        print('*AVH-Export: Share dialog opened');
-      } else {
-        print('*AVH-Export: File not found');
+      else {
+        print('*AVH-Export: Storage permission is granted. Haleluja.');
       }
-    } catch (e) {
-      print('*AVH-Export: Error exporting settings: $e');
+    }
+    else {
+      // ios
+      Map<String, dynamic> allSettings = {};
+      for (int i = 1; i <= 9; i++) {
+        allSettings['StartHere_training_$i'] =
+        await _getTrainingSettings('StartHere', i);
+        allSettings['Trainings_training_$i'] =
+        await _getTrainingSettings('Trainings', i);
+      }
+      print('*AVH-Export: Settings to export: $allSettings');
+
+      try {
+        final directory = Platform.isAndroid
+            ? Directory('/storage/emulated/0/Download')
+            : await getApplicationDocumentsDirectory();
+
+        print('*AVH-Export: Directory: ${directory.path}');
+        if (directory == null) {
+          print('*AVH-Export: Directory is null');
+          return;
+        }
+
+        final file = File('${directory.path}/training_settings.json');
+        print('*AVH-Export: File path: ${file.path}');
+
+        await file.create(recursive: true);
+        await file.writeAsString(json.encode(allSettings));
+
+        if (await file.exists()) {
+          print('*AVH-Export: File exists: ${file.path}');
+          String content = await file.readAsString();
+          print('*AVH-Export: File content: $content');
+
+          await Share.shareXFiles(
+              [XFile(file.path)], text: 'Here are my PadelShooter settings.');
+          print('*AVH-Export: Share dialog opened');
+        } else {
+          print('*AVH-Export: File not found');
+        }
+      } catch (e) {
+        print('*AVH-Export: Error exporting settings: $e');
+      }
     }
   }
 
