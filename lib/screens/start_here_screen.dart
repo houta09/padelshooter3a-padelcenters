@@ -326,8 +326,10 @@ class _StartHereScreenState extends State<StartHereScreen> {
   }
 
   Widget _buildActionableButton(BuildContext context, String label, int index) {
-    String imageNormal = 'assets/images/Padelbaan_full_${label.toLowerCase().replaceAll(" ", "_")}.png';
-    String imagePressed = 'assets/images/Padelbaan_full_${label.toLowerCase().replaceAll(" ", "_")}_green.png';
+    String imageNormal = 'assets/images/Padelbaan_full_${label.toLowerCase()
+        .replaceAll(" ", "_")}.png';
+    String imagePressed = 'assets/images/Padelbaan_full_${label.toLowerCase()
+        .replaceAll(" ", "_")}_green.png';
 
     String imageToShow = (_activeButton == index) ? imagePressed : imageNormal;
 

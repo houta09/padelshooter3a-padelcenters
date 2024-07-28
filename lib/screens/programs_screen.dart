@@ -27,10 +27,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
   final TextEditingController _programNameController = TextEditingController();
   final TextEditingController _newCategoryController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   int _currentShotCount = 1;
   int _selectedShotIndex = -1; // Index of the selected shot
   String? _selectedCategory;
+  List<String> _categories = [];
+  List<Map<String, String>> _filteredPrograms = [];
   BluetoothManager? _bluetoothManager;
 
   bool _isCategoryButtonPressed = false;
@@ -49,6 +52,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     super.initState();
     _bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
     _loadModePreference();
+    _loadCategories();
   }
 
   Future<void> _loadModePreference() async {
@@ -56,6 +60,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     String mode = prefs.getString('selected_mode') ?? 'Padel';
     setState(() {
       _maxSpeed = mode == 'Tennis' ? 250 : 100;
+    });
+  }
+
+  Future<void> _loadCategories() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _categories = prefs.getStringList('categories') ?? [];
     });
   }
 
@@ -93,20 +104,20 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     print('*AVH: Program saved: ${_programNameController.text}');
   }
 
-  Future<void> _loadProgram(String programName) async {
-    if (_selectedCategory == null) return;
+  Future<void> _loadProgram(String category, String programName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    int shotCount = prefs.getInt("${_selectedCategory!}_${programName}_ShotCount") ?? 1;
+    int shotCount = prefs.getInt("${category}_${programName}_ShotCount") ?? 1;
     setState(() {
+      _selectedCategory = category;
       _currentShotCount = shotCount;
       _programNameController.text = programName;
     });
     for (int i = 0; i < _currentShotCount; i++) {
-      _shots[i]["Speed"]!.text = (prefs.getInt("${_selectedCategory!}_${programName}_Speed_$i") ?? 0).toString();
-      _shots[i]["Spin"]!.text = ((prefs.getInt("${_selectedCategory!}_${programName}_Spin_$i") ?? 0)).toString();
-      _shots[i]["Freq"]!.text = (prefs.getInt("${_selectedCategory!}_${programName}_Freq_$i") ?? 0).toString();
-      _shots[i]["Width"]!.text = (prefs.getInt("${_selectedCategory!}_${programName}_Width_$i") ?? 0).toString();
-      _shots[i]["Height"]!.text = (prefs.getInt("${_selectedCategory!}_${programName}_Height_$i") ?? 0).toString();
+      _shots[i]["Speed"]!.text = (prefs.getInt("${category}_${programName}_Speed_$i") ?? 0).toString();
+      _shots[i]["Spin"]!.text = ((prefs.getInt("${category}_${programName}_Spin_$i") ?? 0)).toString();
+      _shots[i]["Freq"]!.text = (prefs.getInt("${category}_${programName}_Freq_$i") ?? 0).toString();
+      _shots[i]["Width"]!.text = (prefs.getInt("${category}_${programName}_Width_$i") ?? 0).toString();
+      _shots[i]["Height"]!.text = (prefs.getInt("${category}_${programName}_Height_$i") ?? 0).toString();
     }
     print('*AVH: Program loaded: $programName');
   }
@@ -146,9 +157,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String mode = prefs.getString('selected_mode') ?? 'Padel';
     int maxSpeed = mode == 'Tennis' ? 250 : 100;
-
-
-
 
     await _bluetoothManager?.sendProgramToPadelshooter(program, maxSpeed);
     print('*AVH: Program played: ${_programNameController.text}');
@@ -294,6 +302,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     if (category != null) {
       setState(() {
         _selectedCategory = category;
+        _searchPrograms();
       });
       print('*AVH: Category selected: $_selectedCategory');
     }
@@ -352,7 +361,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     );
 
     if (programName != null) {
-      _loadProgram(programName);
+      _loadProgram(_selectedCategory!, programName);
     }
   }
 
@@ -367,6 +376,58 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       _isCopyShotButtonPressed = false;
       _isMoveUpButtonPressed = false;
       _isMoveDownButtonPressed = false;
+    });
+  }
+
+  Future<void> _searchPrograms() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<Map<String, String>> allFilteredPrograms = [];
+
+    if (_selectedCategory == null) {
+      for (String category in _categories) {
+        List<String> programs = prefs.getStringList('programs_$category') ?? [];
+        if (_searchController.text.isEmpty) {
+          allFilteredPrograms.addAll(programs.map((program) => {'category': category, 'program': program}));
+        } else {
+          allFilteredPrograms.addAll(programs.where((program) => program.toLowerCase().contains(_searchController.text.toLowerCase())).map((program) => {'category': category, 'program': program}));
+        }
+      }
+    } else {
+      List<String> programs = prefs.getStringList('programs_${_selectedCategory!}') ?? [];
+      if (_searchController.text.isEmpty) {
+        allFilteredPrograms = programs.map((program) => {'category': _selectedCategory!, 'program': program}).toList();
+      } else {
+        allFilteredPrograms = programs.where((program) => program.toLowerCase().contains(_searchController.text.toLowerCase())).map((program) => {'category': _selectedCategory!, 'program': program}).toList();
+      }
+    }
+
+    setState(() {
+      _filteredPrograms = allFilteredPrograms;
+      _programNameController.clear();
+      _clearShots();
+    });
+
+    print('Programs filtered: $_filteredPrograms');
+  }
+
+  void _resetFilters() {
+    setState(() {
+      _selectedCategory = null;
+      _programNameController.clear();
+      _searchController.clear();
+      _filteredPrograms = [];
+      _clearShots();
+    });
+  }
+
+  void _clearShots() {
+    setState(() {
+      _currentShotCount = 0;
+      for (var shot in _shots) {
+        shot.forEach((key, controller) {
+          controller.clear();
+        });
+      }
     });
   }
 
@@ -415,6 +476,60 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     ),
                     child: Text(_selectedCategory ?? (AppLocalizations.of(context).translate('cat') ?? 'Category')),
                   ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _searchController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: 'Search Programs',
+                      labelStyle: const TextStyle(color: Colors.white),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.search, color: Colors.white),
+                        onPressed: _searchPrograms,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _searchPrograms,
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blue,
+                          fixedSize: const Size(150, 40),
+                        ),
+                        child: const Text('Search'),
+                      ),
+                      ElevatedButton(
+                        onPressed: _resetFilters,
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.grey[700],
+                          fixedSize: const Size(150, 40),
+                        ),
+                        child: const Text('Reset'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  ..._filteredPrograms.map((program) {
+                    return ListTile(
+                      title: Text(program['program']!, style: const TextStyle(color: Colors.white)),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          _selectedCategory = program['category'];
+                          _deleteProgram(program['program']!);
+                          _searchPrograms();
+                        },
+                      ),
+                      onTap: () {
+                        _loadProgram(program['category']!, program['program']!);
+                      },
+                    );
+                  }).toList(),
                   const SizedBox(height: 20),
                   ...List.generate(_currentShotCount, (index) {
                     return Column(
@@ -589,7 +704,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           fixedSize: const Size(150, 40),
                         ),
                         child: Text(AppLocalizations.of(context).translate('delshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
-
                       ),
                       ElevatedButton(
                         onPressed: _selectedShotIndex != -1 ? () {
