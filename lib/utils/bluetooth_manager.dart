@@ -22,6 +22,22 @@ class BluetoothManager extends ChangeNotifier {
   static const String serviceUUID = "fff0";
   static const String characteristicUUID = "fff2";
 
+  int _startSpeed = 250;
+  int _speedFactor = 8;
+
+  int get startSpeed => _startSpeed;
+  int get speedFactor => _speedFactor;
+
+  set startSpeed(int value) {
+    _startSpeed = value;
+    notifyListeners();
+  }
+
+  set speedFactor(int value) {
+    _speedFactor = value;
+    notifyListeners();
+  }
+
   Future<void> initialize() async {
     await requestPermissions();
     await initializeBluetooth();
@@ -133,10 +149,6 @@ class BluetoothManager extends ChangeNotifier {
     int delayLevel = 50,
     int hmin = 0,
     int hmax = 100,
-//    int startSpeed = 250,
-//    int speedFactor = 50,
-    int startSpeed = 250,
-    int speedFactor = 8,
     int speed = 15,
     int spin = 0,
     int freq = 40,
@@ -148,7 +160,7 @@ class BluetoothManager extends ChangeNotifier {
     int endByte = 255,
   }) async {
     List<int> intData = [
-      command, maxSpeed, delayLevel, hmin, hmax, startSpeed, speedFactor,
+      command, maxSpeed, delayLevel, hmin, hmax, _startSpeed, _speedFactor,
       speed, convertSpinValue(spin), freq, width, height, training, net, generalInfo, endByte
     ];
     if (!isConnected) await connect(device);
@@ -156,7 +168,7 @@ class BluetoothManager extends ChangeNotifier {
   }
 
   Future<void> sendProgramToPadelshooter(List<List<int>> program, int maxSpeed) async {
-    List<int> intData = [11, maxSpeed, 0, 0, 100, 100, 9, 0];
+    List<int> intData = [11, maxSpeed, 0, 0, 100, _startSpeed, _speedFactor, 0];
     for (var shot in program) {
       if (shot.any((value) => value != 0)) {
         shot[1] = convertSpinValue(shot[1]); // Convert spin value
@@ -177,5 +189,5 @@ class BluetoothManager extends ChangeNotifier {
 }
 
 int convertSpinValue(int spin) {
-  return ((-1*spin) + 50); // Convert spin from -50..50 to 0..100
+  return ((-1 * spin) + 50); // Convert spin from -50..50 to 0..100
 }

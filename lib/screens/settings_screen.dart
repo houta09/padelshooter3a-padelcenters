@@ -40,9 +40,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _selectedLanguage = prefs.getString('language_code') ?? 'en';
       _selectedMode = prefs.getString('selected_mode') ?? 'Padel';
+      _bluetoothManager.startSpeed = prefs.getInt('startSpeed') ?? 250;
+      _bluetoothManager.speedFactor = prefs.getInt('speedFactor') ?? 8;
     });
     print('*AVH-lang-s: Loaded language preference: $_selectedLanguage');
     print('*AVH-mode: Loaded mode preference: $_selectedMode');
+    print('*AVH-settings: Loaded startSpeed: ${_bluetoothManager.startSpeed}');
+    print('*AVH-settings: Loaded speedFactor: ${_bluetoothManager.speedFactor}');
   }
 
   Future<void> _setLanguagePreference(String languageCode) async {
@@ -67,6 +71,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _selectedMode = mode;
     });
     print('*AVH-mode: Mode preference set to: $mode');
+  }
+
+  Future<void> _setStartSpeed(int value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('startSpeed', value);
+    setState(() {
+      _bluetoothManager.startSpeed = value;
+    });
+    print('*AVH-settings: Start speed set to: $value');
+  }
+
+  Future<void> _setSpeedFactor(int value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('speedFactor', value);
+    setState(() {
+      _bluetoothManager.speedFactor = value;
+    });
+    print('*AVH-settings: Speed factor set to: $value');
   }
 
   Future<void> _requestPermissions() async {
@@ -387,7 +409,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _importSettingsFromWeb() async {
     print('*AVH-Import: Import Settings from Web button pressed');
     try {
-      final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/training_settings_PS3A.json'));
+      final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/2024/07/training_settings.json'));
 
       if (response.statusCode == 200) {
         print('*AVH-Import: Successfully fetched settings from web');
@@ -757,6 +779,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Start Speed',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+              ),
+              Slider(
+                value: _bluetoothManager.startSpeed.toDouble(),
+                min: 0,
+                max: 250,
+                divisions: 250,
+                label: _bluetoothManager.startSpeed.toString(),
+                onChanged: (value) {
+                  _setStartSpeed(value.toInt());
+                },
+              ),
+              Text(
+                'Speed Factor',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+              ),
+              Slider(
+                value: _bluetoothManager.speedFactor.toDouble(),
+                min: 0,
+                max: 30,
+                divisions: 30,
+                label: _bluetoothManager.speedFactor.toString(),
+                onChanged: (value) {
+                  _setSpeedFactor(value.toInt());
+                },
               ),
             ],
           ),

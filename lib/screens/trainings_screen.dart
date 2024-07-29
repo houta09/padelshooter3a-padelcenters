@@ -261,8 +261,6 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
               delayLevel: int.parse(_controllers["Delay"]!.text),
               hmin: fieldValues["Hmin"]!,
               hmax: fieldValues["Hmax"]!,
-              startSpeed: 100,
-              speedFactor: 9,
               speed: int.parse(_controllers["Speed"]!.text),
               spin: int.parse(_controllers["Spin"]!.text),
               freq: int.parse(_controllers["Freq"]!.text),

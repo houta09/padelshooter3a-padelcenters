@@ -32,10 +32,10 @@ class _StartHereScreenState extends State<StartHereScreen> {
     3: 24,
     4: 33,
     5: 21,
-    6: 23,
+    6: 20,
     7: 25,
-    8: 23,
-    9: 23,
+    8: 20,
+    9: 20,
   };
 
   int _currentTrainingValue = 20;
@@ -232,8 +232,6 @@ class _StartHereScreenState extends State<StartHereScreen> {
               delayLevel: 50,
               hmin: fieldValues["Hmin"]!,
               hmax: fieldValues["Hmax"]!,
-              startSpeed: 100,
-              speedFactor: 9,
               speed: int.parse(_controllers["Speed"]!.text),
               spin: int.parse(_controllers["Spin"]!.text),
               freq: int.parse(_controllers["Freq"]!.text),
@@ -326,10 +324,8 @@ class _StartHereScreenState extends State<StartHereScreen> {
   }
 
   Widget _buildActionableButton(BuildContext context, String label, int index) {
-    String imageNormal = 'assets/images/Padelbaan_full_${label.toLowerCase()
-        .replaceAll(" ", "_")}.png';
-    String imagePressed = 'assets/images/Padelbaan_full_${label.toLowerCase()
-        .replaceAll(" ", "_")}_green.png';
+    String imageNormal = 'assets/images/Padelbaan_full_${label.toLowerCase().replaceAll(" ", "_")}.png';
+    String imagePressed = 'assets/images/Padelbaan_full_${label.toLowerCase().replaceAll(" ", "_")}_green.png';
 
     String imageToShow = (_activeButton == index) ? imagePressed : imageNormal;
 
