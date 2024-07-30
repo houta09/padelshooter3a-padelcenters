@@ -16,7 +16,7 @@ import 'dart:convert';
 Future<void> _importSettingsFromWeb() async {
   print('*AVH-Import: Import from Web function called');
   try {
-    final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/2024/07/training_settings.json'));
+    final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/training_settings_PS3A.json'));
 
     if (response.statusCode == 200) {
       print('*AVH-Import: Successfully fetched settings from web');

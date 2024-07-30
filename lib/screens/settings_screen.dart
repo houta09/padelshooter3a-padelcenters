@@ -16,8 +16,9 @@ import 'package:cross_file/cross_file.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Function(int) onNavigate;
+  final bool developer; // Add developer flag
 
-  const SettingsScreen({Key? key, required this.onNavigate}) : super(key: key);
+  const SettingsScreen({Key? key, required this.onNavigate, this.developer = true}) : super(key: key);
 
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
@@ -40,13 +41,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _selectedLanguage = prefs.getString('language_code') ?? 'en';
       _selectedMode = prefs.getString('selected_mode') ?? 'Padel';
-      _bluetoothManager.startSpeed = prefs.getInt('startSpeed') ?? 250;
-      _bluetoothManager.speedFactor = prefs.getInt('speedFactor') ?? 8;
+      if (widget.developer) {
+        _bluetoothManager.startSpeed = prefs.getInt('startSpeed') ?? 50;
+        _bluetoothManager.speedFactor = prefs.getInt('speedFactor') ?? 5;
+      }
     });
     print('*AVH-lang-s: Loaded language preference: $_selectedLanguage');
     print('*AVH-mode: Loaded mode preference: $_selectedMode');
-    print('*AVH-settings: Loaded startSpeed: ${_bluetoothManager.startSpeed}');
-    print('*AVH-settings: Loaded speedFactor: ${_bluetoothManager.speedFactor}');
+    if (widget.developer) {
+      print('*AVH-settings: Loaded startSpeed: ${_bluetoothManager.startSpeed}');
+      print('*AVH-settings: Loaded speedFactor: ${_bluetoothManager.speedFactor}');
+    }
   }
 
   Future<void> _setLanguagePreference(String languageCode) async {
@@ -91,7 +96,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     print('*AVH-settings: Speed factor set to: $value');
   }
 
-  Future<void> _requestPermissions() async {
+  Future<bool> _requestPermissions() async {
     print('*AVH-Export: Requesting storage permission');
 
     if (Platform.isAndroid) {
@@ -102,8 +107,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
       if (status.isGranted) {
         print('*AVH-Export: Storage permission granted.');
+        return(true);
       } else {
         print('*AVH-Export: Storage permission not granted.');
+        return(false);
       }
     } else {
       Map<Permission, PermissionStatus> statuses = await [
@@ -130,9 +137,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       if (status.isGranted && manageStatus.isGranted) {
         print('*AVH-Export: Storage permission granted.');
+        return(true);
       } else {
         print('*AVH-Export: Storage permission not granted. Status: $status');
         print('*AVH-Export: Manage storage permission not granted. Status: $manageStatus');
+        return(false);
       }
     }
   }
@@ -216,7 +225,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _importPrograms(BuildContext context) async {
     print('*AVH-Import: Import Programs button pressed');
 
-    bool permissionGranted = await _requestStoragePermission();
+    bool permissionGranted = await _requestPermissions();
+    await Future.delayed(const Duration(milliseconds: 500));
     if (!permissionGranted) {
       return;
     }
@@ -288,7 +298,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _importSettings(BuildContext context) async {
     print('*AVH-Import: Import Settings button pressed');
 
-    bool permissionGranted = await _requestStoragePermission();
+    bool permissionGranted = await _requestPermissions();
+    await Future.delayed(const Duration(milliseconds: 500));
     if (!permissionGranted) {
       return;
     }
@@ -356,9 +367,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _exportSettings() async {
     print('*AVH-Export: Export button pressed');
     if (Platform.isAndroid) {
-      var status = await Permission.manageExternalStorage.status;
+      bool permissionGranted = await _requestPermissions();
       await Future.delayed(const Duration(milliseconds: 500));
-      if (!status.isGranted) {
+      if (!permissionGranted) {
         print('*AVH-Export: Storage permission not granted. Cannot export settings.');
         return;
       } else {
@@ -450,9 +461,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _exportPrograms() async {
     print('*AVH-Export: Export Programs button pressed');
     if (Platform.isAndroid) {
-      var status = await Permission.manageExternalStorage.status;
+      bool permissionGranted = await _requestPermissions();
       await Future.delayed(const Duration(milliseconds: 500));
-      if (!status.isGranted) {
+      if (!permissionGranted) {
         print('*AVH-Export: Storage permission not granted. Cannot export settings.');
         return;
       } else {
@@ -780,35 +791,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              Text(
-                'Start Speed',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
-              ),
-              Slider(
-                value: _bluetoothManager.startSpeed.toDouble(),
-                min: 0,
-                max: 250,
-                divisions: 250,
-                label: _bluetoothManager.startSpeed.toString(),
-                onChanged: (value) {
-                  _setStartSpeed(value.toInt());
-                },
-              ),
-              Text(
-                'Speed Factor',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
-              ),
-              Slider(
-                value: _bluetoothManager.speedFactor.toDouble(),
-                min: 0,
-                max: 30,
-                divisions: 30,
-                label: _bluetoothManager.speedFactor.toString(),
-                onChanged: (value) {
-                  _setSpeedFactor(value.toInt());
-                },
-              ),
+              if (widget.developer) ...[
+                const SizedBox(height: 20),
+                Text(
+                  'Start Speed',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                ),
+                Slider(
+                  value: _bluetoothManager.startSpeed.toDouble(),
+                  min: 0,
+                  max: 250,
+                  divisions: 250,
+                  label: _bluetoothManager.startSpeed.toString(),
+                  onChanged: (value) {
+                    _setStartSpeed(value.toInt());
+                  },
+                ),
+                Text(
+                  'Speed Factor',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                ),
+                Slider(
+                  value: _bluetoothManager.speedFactor.toDouble(),
+                  min: 0,
+                  max: 30,
+                  divisions: 30,
+                  label: _bluetoothManager.speedFactor.toString(),
+                  onChanged: (value) {
+                    _setSpeedFactor(value.toInt());
+                  },
+                ),
+              ],
             ],
           ),
         ),
