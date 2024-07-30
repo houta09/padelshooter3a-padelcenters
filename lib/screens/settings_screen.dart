@@ -18,7 +18,7 @@ class SettingsScreen extends StatefulWidget {
   final Function(int) onNavigate;
   final bool developer; // Add developer flag
 
-  const SettingsScreen({Key? key, required this.onNavigate, this.developer = true}) : super(key: key);
+  const SettingsScreen({Key? key, required this.onNavigate, this.developer = false}) : super(key: key);
 
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
