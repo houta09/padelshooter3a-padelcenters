@@ -107,46 +107,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
       if (status.isGranted) {
         print('*AVH-Export: Storage permission granted.');
-        return(true);
+        return true;
       } else {
         print('*AVH-Export: Storage permission not granted.');
-        return(false);
+        return false;
       }
     } else {
-      Map<Permission, PermissionStatus> statuses = await [
-        Permission.storage,
-        Permission.manageExternalStorage,
-      ].request();
-
-      PermissionStatus status = statuses[Permission.storage] ?? PermissionStatus.denied;
-      PermissionStatus manageStatus = statuses[Permission.manageExternalStorage] ?? PermissionStatus.denied;
-
-      print('*AVH-Export: Initial permission status: $status');
-      print('*AVH-Export: Manage storage permission status: $manageStatus');
-
-      if (status.isDenied || manageStatus.isDenied || status.isPermanentlyDenied || manageStatus.isPermanentlyDenied) {
-        statuses = await [
-          Permission.storage,
-          Permission.manageExternalStorage,
-        ].request();
-        status = statuses[Permission.storage] ?? PermissionStatus.denied;
-        manageStatus = statuses[Permission.manageExternalStorage] ?? PermissionStatus.denied;
-        print('*AVH-Export: Requested permission status: $status');
-        print('*AVH-Export: Requested manage storage permission status: $manageStatus');
-      }
-
-      if (status.isGranted && manageStatus.isGranted) {
-        print('*AVH-Export: Storage permission granted.');
-        return(true);
-      } else {
-        print('*AVH-Export: Storage permission not granted. Status: $status');
-        print('*AVH-Export: Manage storage permission not granted. Status: $manageStatus');
-        return(false);
-      }
+      return true;
     }
   }
 
   Future<bool> _requestStoragePermission() async {
+    if (Platform.isIOS) {
+      return true; // No need for permissions on iOS
+    }
+
     var status = await Permission.storage.status;
     print('*AVH-Import: Initial storage permission status: $status');
 
