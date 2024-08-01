@@ -22,8 +22,8 @@ class BluetoothManager extends ChangeNotifier {
   static const String serviceUUID = "fff0";
   static const String characteristicUUID = "fff2";
 
-  int _startSpeed = 250;
-  int _speedFactor = 8;
+  int _startSpeed = 50;
+  int _speedFactor = 5;
 
   int get startSpeed => _startSpeed;
   int get speedFactor => _speedFactor;
