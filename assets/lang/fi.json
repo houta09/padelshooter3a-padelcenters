@@ -13,7 +13,7 @@
   "delay": "Viive",
   "off": "Pois",
   "play": "Pelaa",
-  "app_title": "PadelShooter",
+  "app_title": "PadelShooter 3A",
   "main_screen": "Pää",
   "start_here_screen": "Aloita Tästä",
   "trainings_screen": "Harjoitukset",
@@ -34,7 +34,7 @@
   "latvia": "Latvia",
   "finnish": "Suomi",
   "arabic": "Arabia",
-  "dutch": "Hollanti",
+  "netherlands": "Hollanti",
   "main": "Pää",
   "start_here": "Aloita Tästä",
   "trainings": "Harjoitukset",
@@ -74,5 +74,9 @@
   "import_programs": "Tuo ohjelmat",
   "import_programs_web": "Tuo ohjelmat verkosta",
   "pos_ps_text": "Padelshooter ei voi saavuttaa koko padelkentän leveyttä. Jos haluat pelata laajemmin, voit siirtää Padelshooteria saavuttaaksesi suuremman osan siitä sivusta. Voit myös käyttää keskimmäistä painiketta sijoittaaksesi Padelshooterin tarkalleen kentän keskelle. Paina haluamaasi puolta ja sijoita sitten Padelshooter niin, että kone ampuu tarkalleen keskiviivalle.",
-  "help-info": "Padelshooterilla on 3 näyttöä:\n\nAloita tästä:\nAloita heti koneen kanssa ja helppokäyttöisesti. Useimmat harjoitukset ovat 1 tyyppisiä laukauksia 1 sijainnissa jonkin verran vaihtelua. Tämä on helpoin tapa oppia käyttämään nopeutta, spinniä, taajuutta, leveyttä, korkeutta ja verkkoa.\n\nHarjoitukset:\nLaukausten yhdistelmät, kuten bandeja - volley harjoitukset. Volleyn korkeus asetetaan \"Verkko\", bandejan korkeus asetetaan \"Korkeus\". Bandeja tarvitsee enemmän aikaa saapuakseen pelaajaan, joten lisätauko voidaan asettaa \"Viive\".\n\nOhjelmat:\nTee omat harjoitukset / ohjelmat. Ohjelmat tulee lisätä luokkaan, kuten \"Aloittelija\", \"Edistynyt\" tai \"Laukauksen tyyppi\" tai \"1 pelaaja\", \"2 pelaajaa\".\n\nKone sijoitetaan yleensä vaakasuoraan keskelle lähellä takalasia. Mutta takalasi- ja sivulasipallojen harjoitteluun kulmassa, koneen sijoittaminen vastakkaiseen kulmaan on myös hyödyllistä.\nPadelshooterin perusidea on asettaa haluamasi asetukset nopeudelle, spinnille, taajuudelle, leveydelle ja korkeudelle. Kun käytät sovellusta ensimmäistä kertaa, näillä on vakioasetukset ja ne tulisi muuttaa kerran ja muistaa jokaiselle seuraavalle harjoitukselle.\nJoissakin harjoituksissa \"verkko\" on hyödyllinen, pallot eivät mene tämän verkkokorkeuden alle. Näin voit satunnaisissa korkeusharjoituksissa asettaa matalimman mahdollisen sijainnin \"Verkko\"-asetuksella, riippumatta siitä, kuinka matala nopeus on. Harjoittelua varten kentän vasemmalla tai oikealla puolella voit valita painamalla kyseistä painiketta tai molempia koko kentälle. Harjoittelunäytössä voit tehdä vaakasuorasta alueesta vielä pienemmän valitsemalla prosenttiosuuden, jossa 0% on vasemmalla ja 100% on oikealla (pelaajan näkökulmasta).\n\nJos sinulla on ongelma, käy verkkosivustollamme \n\nhttps://padelshooter.com/ \nPadelshooter 3A:n latausosassa on hyödyllistä tietoa ongelmien löytämiseksi/ratkaisemiseksi.\nApua ja tukea varten voit ottaa meihin yhteyttä (mieluiten whatsappilla lähettämällä videon) osoitteessa:\n\nDe Racketclub\nPuh: 31-630974299 (myös whatsapp)\n\nTai ota yhteyttä jakelijaasi."
+  "help-info": "Padelshooterilla on 3 näyttöä:\n\nAloita tästä:\nAloita heti koneen kanssa ja helppokäyttöisesti. Useimmat harjoitukset ovat 1 tyyppisiä laukauksia 1 sijainnissa jonkin verran vaihtelua. Tämä on helpoin tapa oppia käyttämään nopeutta, spinniä, taajuutta, leveyttä, korkeutta ja verkkoa.\n\nHarjoitukset:\nLaukausten yhdistelmät, kuten bandeja - volley harjoitukset. Volleyn korkeus asetetaan \"Verkko\", bandejan korkeus asetetaan \"Korkeus\". Bandeja tarvitsee enemmän aikaa saapuakseen pelaajaan, joten lisätauko voidaan asettaa \"Viive\".\n\nOhjelmat:\nTee omat harjoitukset / ohjelmat. Ohjelmat tulee lisätä luokkaan, kuten \"Aloittelija\", \"Edistynyt\" tai \"Laukauksen tyyppi\" tai \"1 pelaaja\", \"2 pelaajaa\".\n\nKone sijoitetaan yleensä vaakasuoraan keskelle lähellä takalasia. Mutta takalasi- ja sivulasipallojen harjoitteluun kulmassa, koneen sijoittaminen vastakkaiseen kulmaan on myös hyödyllistä.\nPadelshooterin perusidea on asettaa haluamasi asetukset nopeudelle, spinnille, taajuudelle, leveydelle ja korkeudelle. Kun käytät sovellusta ensimmäistä kertaa, näillä on vakioasetukset ja ne tulisi muuttaa kerran ja muistaa jokaiselle seuraavalle harjoitukselle.\nJoissakin harjoituksissa \"verkko\" on hyödyllinen, pallot eivät mene tämän verkkokorkeuden alle. Näin voit satunnaisissa korkeusharjoituksissa asettaa matalimman mahdollisen sijainnin \"Verkko\"-asetuksella, riippumatta siitä, kuinka matala nopeus on. Harjoittelua varten kentän vasemmalla tai oikealla puolella voit valita painamalla kyseistä painiketta tai molempia koko kentälle. Harjoittelunäytössä voit tehdä vaakasuorasta alueesta vielä pienemmän valitsemalla prosenttiosuuden, jossa 0% on vasemmalla ja 100% on oikealla (pelaajan näkökulmasta).\n\nJos sinulla on ongelma, käy verkkosivustollamme \n\nhttps://padelshooter.com/ \nPadelshooter 3A:n latausosassa on hyödyllistä tietoa ongelmien löytämiseksi/ratkaisemiseksi.\nApua ja tukea varten voit ottaa meihin yhteyttä (mieluiten whatsappilla lähettämällä videon) osoitteessa:\n\nDe Racketclub\nPuh: 31-630974299 (myös whatsapp)\n\nTai ota yhteyttä jakelijaasi.",
+  "version": "Versio",
+  "search": "Hae",
+  "search_programs": "Etsi ohjelmia",
+  "reset": "Nollaa"
 }

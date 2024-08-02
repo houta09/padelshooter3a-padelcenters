@@ -50,6 +50,7 @@ flutter:
     - assets/lang/ja.json
     - assets/lang/ar.json
     - assets/lang/lv.json
+    - assets/lang/nl.json
     - assets/images/bluetooth-icon.png
     - assets/images/bluetooth-icon-greenbg.png
     - assets/images/Padelbaan_full_2-line.png

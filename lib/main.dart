@@ -74,7 +74,7 @@ void main() async {
 
     // Set default to English if not set or not supported
     if (languageCode == null || ![
-      'en', 'es', 'fr', 'zh', 'pt', 'pl', 'fi', 'lv', 'sv', 'it', 'de', 'ja', 'ar'
+      'en', 'es', 'fr', 'zh', 'pt', 'pl', 'fi', 'lv','nl', 'sv', 'it', 'de', 'ja', 'ar'
     ].contains(languageCode)) {
       languageCode = 'en';
     }
@@ -134,7 +134,7 @@ class _PadelShooterAppState extends State<PadelShooterApp> {
           FocusScope.of(context).unfocus();
         },
         child: MaterialApp(
-          title: 'Padelshooter',
+          title: 'Padelshooter 3A',
           home: const DynamicContentFrame(),
           locale: _locale,
           supportedLocales: const [
@@ -145,6 +145,7 @@ class _PadelShooterAppState extends State<PadelShooterApp> {
             Locale('de', ''), // German
             Locale('pt', ''), // Portuguese
             Locale('lv', ''), // Latvia
+            Locale('nl', ''), // Netherlands
             Locale('it', ''), // Italian
             Locale('sv', ''), // Swedish
             Locale('fi', ''), // Finnish
@@ -218,7 +219,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
   String _getPageTitle() {
     switch (_currentPageIndex) {
       case 0:
-        return AppLocalizations.of(context).translate('main') ?? 'Main';
+        return AppLocalizations.of(context).translate('app_title') ?? 'Padelshooter 3A';
       case 1:
         return AppLocalizations.of(context).translate('start_here') ?? 'Start Here';
       case 2:
@@ -258,6 +259,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
     print('*AVH-lang-m: Building DynamicContentFrame with page index: $_currentPageIndex');
 
     final String mainLabel = AppLocalizations.of(context).translate('main') ?? 'Main';
+    final String titleLabel = AppLocalizations.of(context).translate('app_title') ?? 'Padelshooter 3A';
     final String startHereLabel = AppLocalizations.of(context).translate('start_here') ?? 'Start Here';
     final String trainingsLabel = AppLocalizations.of(context).translate('trainings') ?? 'Trainings';
     final String programsLabel = AppLocalizations.of(context).translate('programs') ?? 'Programs';

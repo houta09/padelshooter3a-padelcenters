@@ -12,7 +12,7 @@
   "net": "Net",
   "off": "Off",
   "play": "Play",
-  "app_title": "PadelShooter",
+  "app_title": "PadelShooter 3A",
   "main_screen": "Main",
   "start_here_screen": "Start Here",
   "trainings_screen": "Trainings",
@@ -33,7 +33,7 @@
   "italian": "Italian",
   "finnish": "Finnish",
   "arabic": "Arabic",
-  "dutch": "Dutch",
+  "netherlands": "Netherlands",
   "main": "Main",
   "start_here": "Start Here",
   "trainings": "Trainings",
@@ -74,5 +74,9 @@
   "export_programs": "Export Programs",
   "import_programs": "Import Programs",
   "import_programs_web": "Import Programs from Web",
-  "pos_ps_text": "The Padelshooter can't reach the whole padelcourt width. If you want to play more wide, you can reposition the Padelshooter for reaching a bigger part of that side. Also you can use the Middle button to position the Padelshooter exact to middle of the court. Press the side you want to play, then position the Padelshooter so that the machine is shooting exact in the middle line."
+  "pos_ps_text": "The Padelshooter can't reach the whole padelcourt width. If you want to play more wide, you can reposition the Padelshooter for reaching a bigger part of that side. Also you can use the Middle button to position the Padelshooter exact to middle of the court. Press the side you want to play, then position the Padelshooter so that the machine is shooting exact in the middle line.",
+  "version": "Version",
+  "search": "Search",
+  "search_programs": "Search Programs",
+  "reset": "Reset"
 }

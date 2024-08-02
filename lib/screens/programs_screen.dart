@@ -14,6 +14,7 @@ class ProgramsScreen extends StatefulWidget {
 }
 
 class _ProgramsScreenState extends State<ProgramsScreen> {
+  // Initialize text editing controllers for various fields
   final List<Map<String, TextEditingController>> _shots = List.generate(
     20,
         (_) => {
@@ -73,14 +74,14 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   Future<void> _saveProgram() async {
     if (_programNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a name for the program.')),
+        SnackBar(content: Text(AppLocalizations.of(context).translate('Please enter a name for the program.') ?? 'Please enter a name for the program.')),
       );
       return;
     }
 
     if (_selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a category.')),
+        SnackBar(content: Text(AppLocalizations.of(context).translate('Please select a category.') ?? 'Please select a category.')),
       );
       return;
     }
@@ -182,7 +183,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields for existing shots before adding a new one.')),
+        SnackBar(content: Text(AppLocalizations.of(context).translate('Please fill in all fields for existing shots before adding a new one.') ?? 'Please fill in all fields for existing shots before adding a new one.')),
       );
     }
   }
@@ -244,7 +245,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Select Category'),
+          title: Text(AppLocalizations.of(context).translate('Select Category') ?? 'Select Category'),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
@@ -272,8 +273,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           actions: [
             TextField(
               controller: _newCategoryController,
-              decoration: const InputDecoration(
-                hintText: 'New Category',
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context).translate('New Category') ?? 'New Category',
               ),
             ),
             TextButton(
@@ -286,13 +287,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                   _showCategoryList(context);
                 }
               },
-              child: const Text('Add'),
+              child: Text(AppLocalizations.of(context).translate('Add') ?? 'Add'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context).translate('Cancel') ?? 'Cancel'),
             ),
           ],
         );
@@ -311,7 +312,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   Future<void> _showProgramList(BuildContext context) async {
     if (_selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a category first.')),
+        SnackBar(content: Text(AppLocalizations.of(context).translate('Please select a category first.') ?? 'Please select a category first.')),
       );
       return;
     }
@@ -322,7 +323,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Load Program'),
+          title: Text(AppLocalizations.of(context).translate('Load Program') ?? 'Load Program'),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
@@ -353,7 +354,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context).translate('Cancel') ?? 'Cancel'),
             ),
           ],
         );
@@ -481,7 +482,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     controller: _searchController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      labelText: 'Search Programs',
+                      labelText: AppLocalizations.of(context).translate('search_programs') ?? 'Search Programs',
                       labelStyle: const TextStyle(color: Colors.white),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.search, color: Colors.white),
@@ -500,7 +501,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: Colors.blue,
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Search'),
+                        child: Text(AppLocalizations.of(context).translate('search') ?? 'Search'),
                       ),
                       ElevatedButton(
                         onPressed: _resetFilters,
@@ -509,7 +510,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: const Text('Reset'),
+                        child: Text(AppLocalizations.of(context).translate('reset') ?? 'Reset'),
                       ),
                     ],
                   ),

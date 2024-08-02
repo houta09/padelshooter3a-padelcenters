@@ -28,12 +28,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _selectedLanguage;
   late BluetoothManager _bluetoothManager;
   String _selectedMode = 'Padel'; // Default mode
+  final TextEditingController _passwordController = TextEditingController(); // Password controller
+  bool _isDeveloperMode = false;
 
   @override
   void initState() {
     super.initState();
     _bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
     _loadPreferences();
+    _isDeveloperMode = widget.developer; // Set initial developer mode
   }
 
   Future<void> _loadPreferences() async {
@@ -41,14 +44,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _selectedLanguage = prefs.getString('language_code') ?? 'en';
       _selectedMode = prefs.getString('selected_mode') ?? 'Padel';
-      if (widget.developer) {
+      if (_isDeveloperMode) {
         _bluetoothManager.startSpeed = prefs.getInt('startSpeed') ?? 50;
         _bluetoothManager.speedFactor = prefs.getInt('speedFactor') ?? 5;
       }
     });
     print('*AVH-lang-s: Loaded language preference: $_selectedLanguage');
     print('*AVH-mode: Loaded mode preference: $_selectedMode');
-    if (widget.developer) {
+    if (_isDeveloperMode) {
       print('*AVH-settings: Loaded startSpeed: ${_bluetoothManager.startSpeed}');
       print('*AVH-settings: Loaded speedFactor: ${_bluetoothManager.speedFactor}');
     }
@@ -94,6 +97,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _bluetoothManager.speedFactor = value;
     });
     print('*AVH-settings: Speed factor set to: $value');
+  }
+
+  void _checkDeveloperPassword() {
+    if (_passwordController.text == "padelisfun") {
+      setState(() {
+        _isDeveloperMode = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Developer mode enabled')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid password')),
+      );
+    }
   }
 
   Future<bool> _requestPermissions() async {
@@ -594,6 +612,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'ja': AppLocalizations.of(context)?.translate('japanese') ?? 'Japanese',
       'ar': AppLocalizations.of(context)?.translate('arabic') ?? 'Arabic',
       'lv': AppLocalizations.of(context)?.translate('latvian') ?? 'Latvian',
+      'nl': AppLocalizations.of(context)?.translate('netherlands') ?? 'Netherlands',
     };
 
     final Map<String, String> modes = {
@@ -766,7 +785,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ],
               ),
-              if (widget.developer) ...[
+              if (_isDeveloperMode) ...[
                 const SizedBox(height: 20),
                 Text(
                   'Start Speed',
@@ -795,6 +814,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onChanged: (value) {
                     _setSpeedFactor(value.toInt());
                   },
+                ),
+              ],
+              if (!_isDeveloperMode) ...[
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Enter Developer Password',
+                    labelStyle: TextStyle(color: Colors.grey[700]),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: _checkDeveloperPassword,
+                  child: const Text('Unlock Developer Mode'),
                 ),
               ],
             ],

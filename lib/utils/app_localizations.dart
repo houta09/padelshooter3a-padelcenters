@@ -36,7 +36,7 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
 
   bool isSupported(Locale locale) {
     return [
-      'en', 'es', 'fr', 'zh', 'pt', 'pl', 'fi', 'sv', 'it', 'de', 'ja', 'ar', 'lv'
+      'en', 'es', 'fr', 'zh', 'pt', 'pl', 'fi', 'sv', 'it', 'de', 'ja', 'ar', 'lv', 'nl'
     ].contains(locale.languageCode);
   }
 

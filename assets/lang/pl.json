@@ -13,7 +13,7 @@
   "delay": "Delay",
   "off": "Wyłącz",
   "play": "Graj",
-  "app_title": "PadelShooter",
+  "app_title": "PadelShooter 3A",
   "main_screen": "Główna",
   "start_here_screen": "Zacznij Tutaj",
   "trainings_screen": "Treningi",
@@ -34,7 +34,7 @@
   "finnish": "Fiński",
   "latvia": "Łotwa",
   "arabic": "Arabski",
-  "dutch": "Holenderski",
+  "netherlands": "Holenderski",
   "main": "Główna",
   "start_here": "Zacznij Tutaj",
   "trainings": "Treningi",
@@ -74,5 +74,9 @@
   "import_programs": "Importuj programy",
   "import_programs_web": "Importuj programy z internetu",
   "pos_ps_text": "Padelshooter nie może osiągnąć całej szerokości kortu padel. Jeśli chcesz grać szerzej, możesz przesunąć Padelshooter, aby osiągnąć większą część tej strony. Możesz również użyć przycisku środkowego, aby umieścić Padelshooter dokładnie na środku kortu. Naciśnij stronę, na której chcesz grać, a następnie ustaw Padelshooter tak, aby maszyna strzelała dokładnie w linię środkową.",
-  "help-info": "Dla Padelshootera są 3 ekrany:\n\nZacznij tutaj:\nAby rozpocząć natychmiast z maszyną i łatwym użyciem. Większość treningów to 1 rodzaj strzałów w 1 pozycji z pewną różnorodnością. Jest to najłatwiejszy sposób, aby nauczyć się używać prędkości, spinu, częstotliwości, szerokości, wysokości i siatki.\n\nTreningi:\nKombinacje strzałów, takie jak treningi bandeja - volley. Wysokość volley ustawiana jest za pomocą \"Siatki\", wysokość bandeja za pomocą \"Wysokości\". Bandeja potrzebuje więcej czasu, aby dotrzeć do gracza, więc można ustawić dodatkową pauzę za pomocą \"Opóźnienia\".\n\nProgramy:\nTwórz własne treningi / programy. Programy powinny być dodane do kategorii, takich jak \"Początkujący\", \"Zaawansowany\" lub \"Typ strzału\" lub \"1 gracz\", \"2 graczy\".\n\nMaszyna jest zwykle umieszczana w poziomym środku blisko tylnego szkła. Ale do treningu piłek tylnego i bocznego szkła w rogu, przydatne jest również umieszczenie maszyny w przeciwnym rogu.\nPodstawowym pomysłem Padelshootera jest ustawienie preferowanych ustawień prędkości, spinu, częstotliwości, szerokości i wysokości, podczas pierwszego użycia aplikacji, te mają standardowe ustawienia i powinny być zmienione raz i zapamiętane na każde kolejne szkolenie.\nDo niektórych treningów przydatna jest \"siatka\", piłki nie przechodzą poniżej tej wysokości siatki. W ten sposób można ustawić w treningach losowej wysokości najniższą możliwą pozycję za pomocą \"Siatki\", bez względu na to, jak niska jest prędkość. Do treningu po lewej lub prawej stronie kortu można wybrać, naciskając ten przycisk lub oba dla całego kortu. W ekranie Treningów można ustawić obszar poziomy jeszcze mniejszy, wybierając %, gdzie 0% jest najbardziej na lewo, a 100% jest najbardziej na prawo (widok z perspektywy gracza).\n\nJeśli masz problem, odwiedź naszą stronę internetową \n\nhttps://padelshooter.com/ \nW sekcji pobierania dla Padelshootera 3A znajdują się przydatne informacje do znalezienia/rozwiązania problemów.\nW celu uzyskania pomocy i wsparcia, możesz skontaktować się z nami (najlepiej przez whatsapp, wysyłając wideo) pod adresem:\n\nDe Racketclub\nT: 31-630974299 (również whatsapp)\n\nLub skontaktuj się ze swoim dystrybutorem."
+  "help-info": "Dla Padelshootera są 3 ekrany:\n\nZacznij tutaj:\nAby rozpocząć natychmiast z maszyną i łatwym użyciem. Większość treningów to 1 rodzaj strzałów w 1 pozycji z pewną różnorodnością. Jest to najłatwiejszy sposób, aby nauczyć się używać prędkości, spinu, częstotliwości, szerokości, wysokości i siatki.\n\nTreningi:\nKombinacje strzałów, takie jak treningi bandeja - volley. Wysokość volley ustawiana jest za pomocą \"Siatki\", wysokość bandeja za pomocą \"Wysokości\". Bandeja potrzebuje więcej czasu, aby dotrzeć do gracza, więc można ustawić dodatkową pauzę za pomocą \"Opóźnienia\".\n\nProgramy:\nTwórz własne treningi / programy. Programy powinny być dodane do kategorii, takich jak \"Początkujący\", \"Zaawansowany\" lub \"Typ strzału\" lub \"1 gracz\", \"2 graczy\".\n\nMaszyna jest zwykle umieszczana w poziomym środku blisko tylnego szkła. Ale do treningu piłek tylnego i bocznego szkła w rogu, przydatne jest również umieszczenie maszyny w przeciwnym rogu.\nPodstawowym pomysłem Padelshootera jest ustawienie preferowanych ustawień prędkości, spinu, częstotliwości, szerokości i wysokości, podczas pierwszego użycia aplikacji, te mają standardowe ustawienia i powinny być zmienione raz i zapamiętane na każde kolejne szkolenie.\nDo niektórych treningów przydatna jest \"siatka\", piłki nie przechodzą poniżej tej wysokości siatki. W ten sposób można ustawić w treningach losowej wysokości najniższą możliwą pozycję za pomocą \"Siatki\", bez względu na to, jak niska jest prędkość. Do treningu po lewej lub prawej stronie kortu można wybrać, naciskając ten przycisk lub oba dla całego kortu. W ekranie Treningów można ustawić obszar poziomy jeszcze mniejszy, wybierając %, gdzie 0% jest najbardziej na lewo, a 100% jest najbardziej na prawo (widok z perspektywy gracza).\n\nJeśli masz problem, odwiedź naszą stronę internetową \n\nhttps://padelshooter.com/ \nW sekcji pobierania dla Padelshootera 3A znajdują się przydatne informacje do znalezienia/rozwiązania problemów.\nW celu uzyskania pomocy i wsparcia, możesz skontaktować się z nami (najlepiej przez whatsapp, wysyłając wideo) pod adresem:\n\nDe Racketclub\nT: 31-630974299 (również whatsapp)\n\nLub skontaktuj się ze swoim dystrybutorem.",
+  "version": "Wersja",
+  "search": "Szukaj",
+  "search_programs": "Szukaj programów",
+  "reset": "Resetuj"
 }

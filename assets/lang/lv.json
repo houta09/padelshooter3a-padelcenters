@@ -12,7 +12,7 @@
   "net": "Tīkls",
   "off": "Izslēgts",
   "play": "Spēlēt",
-  "app_title": "PadelShooter",
+  "app_title": "PadelShooter 3A",
   "main_screen": "Galvenais",
   "start_here_screen": "Sākt šeit",
   "trainings_screen": "Treniņi",
@@ -33,7 +33,7 @@
   "italian": "Itāļu",
   "finnish": "Somu",
   "arabic": "Arābu",
-  "dutch": "Holandiešu",
+  "netherlands": "Holandiešu",
   "main": "Galvenais",
   "start_here": "Sākt šeit",
   "trainings": "Treniņi",
@@ -74,5 +74,9 @@
   "import_programs": "Importēt programmas",
   "import_programs_web": "Importēt programmas no tīmekļa",
   "pos_ps_text": "Padelshooter nevar sasniegt visu padel laukuma platumu. Ja vēlaties spēlēt plašāk, varat pārvietot Padelshooter, lai sasniegtu lielāku šī sānu daļu. Jūs varat arī izmantot vidējo pogu, lai novietotu Padelshooter tieši laukuma vidū. Nospiediet to pusi, kurā vēlaties spēlēt, un tad novietojiet Padelshooter tā, lai mašīna šautu tieši uz viduslīniju.",
-  "help-info": "Padelshooter ir 3 ekrāni:\n\nSāciet šeit:\nLai sāktu tūlīt ar mašīnu un vieglu lietošanu. Lielākā daļa treniņu ir 1 veida šāvieni vienā pozīcijā ar dažādām variācijām. Tas ir visvieglākais veids, kā iemācīties izmantot ātrumu, griezienu, frekvenci, platumu, augstumu un tīklu.\n\nTreniņi:\nŠāvienu kombinācijas, piemēram, bandeja - voleja treniņi. Voleja augstumu nosaka ar \"Tīklu\", bandeja augstumu nosaka ar \"Augstumu\". Bandeja prasa vairāk laika, lai sasniegtu spēlētāju, tāpēc ar \"Kavēšanos\" var iestatīt papildu pauzi.\n\nProgrammas:\nIzveidojiet savus treniņus / programmas. Programmas ir jāievieto kategorijās, piemēram, \"Iesācējs\", \"Progresīvs\" vai \"Šāviena veids\" vai \"1 spēlētājs\", \"2 spēlētāji\".\n\nMašīna parasti tiek novietota horizontāli centrā pie aizmugurējā stikla. Bet, lai trenētu aizmugures un sānu stikla bumbiņas stūrī, noder arī mašīnu novietot pretējā stūrī.\nPadelshooter pamatideja ir iestatīt jūsu vēlamo ātrumu, grieziena, frekvences, platuma un augstuma iestatījumus. Kad pirmo reizi izmantojat lietotni, šiem ir standarta iestatījumi, kas jāmaina vienu reizi un tiek atcerēti katram nākamajam treniņam.\nDažiem treniņiem \"tīkls\" ir noderīgs, bumbas neiet zem šī tīkla augstuma. Tādā veidā jūs varat iestatīt nejauša augstuma treniņos iespējami zemāko pozīciju ar \"Tīklu\", neatkarīgi no tā, cik zems ir ātrums. Lai trenētu tiesas kreiso vai labo pusi, varat izvēlēties, nospiežot šo pogu vai abas pogas visai tiesai. Treniņu ekrānā jūs varat padarīt horizontālo zonu vēl mazāku, izvēloties %, kur 0% ir visvairāk pa kreisi un 100% ir visvairāk pa labi (skatoties no spēlētāja).\n\nJa jums ir problēma, apmeklējiet mūsu vietni \n\nhttps://padelshooter.com/ \nLejupielādes sadaļā Padelshooter 3A ir noderīga informācija problēmu atrašanai/risināšanai.\nPalīdzībai un atbalstam varat sazināties ar mums (vēlams whatsapp, nosūtot video) uz:\n\nDe Racketclub\nT: 31-630974299 (arī whatsapp)\n\nVai sazinieties ar savu izplatītāju."
+  "help-info": "Padelshooter ir 3 ekrāni:\n\nSāciet šeit:\nLai sāktu tūlīt ar mašīnu un vieglu lietošanu. Lielākā daļa treniņu ir 1 veida šāvieni vienā pozīcijā ar dažādām variācijām. Tas ir visvieglākais veids, kā iemācīties izmantot ātrumu, griezienu, frekvenci, platumu, augstumu un tīklu.\n\nTreniņi:\nŠāvienu kombinācijas, piemēram, bandeja - voleja treniņi. Voleja augstumu nosaka ar \"Tīklu\", bandeja augstumu nosaka ar \"Augstumu\". Bandeja prasa vairāk laika, lai sasniegtu spēlētāju, tāpēc ar \"Kavēšanos\" var iestatīt papildu pauzi.\n\nProgrammas:\nIzveidojiet savus treniņus / programmas. Programmas ir jāievieto kategorijās, piemēram, \"Iesācējs\", \"Progresīvs\" vai \"Šāviena veids\" vai \"1 spēlētājs\", \"2 spēlētāji\".\n\nMašīna parasti tiek novietota horizontāli centrā pie aizmugurējā stikla. Bet, lai trenētu aizmugures un sānu stikla bumbiņas stūrī, noder arī mašīnu novietot pretējā stūrī.\nPadelshooter pamatideja ir iestatīt jūsu vēlamo ātrumu, grieziena, frekvences, platuma un augstuma iestatījumus. Kad pirmo reizi izmantojat lietotni, šiem ir standarta iestatījumi, kas jāmaina vienu reizi un tiek atcerēti katram nākamajam treniņam.\nDažiem treniņiem \"tīkls\" ir noderīgs, bumbas neiet zem šī tīkla augstuma. Tādā veidā jūs varat iestatīt nejauša augstuma treniņos iespējami zemāko pozīciju ar \"Tīklu\", neatkarīgi no tā, cik zems ir ātrums. Lai trenētu tiesas kreiso vai labo pusi, varat izvēlēties, nospiežot šo pogu vai abas pogas visai tiesai. Treniņu ekrānā jūs varat padarīt horizontālo zonu vēl mazāku, izvēloties %, kur 0% ir visvairāk pa kreisi un 100% ir visvairāk pa labi (skatoties no spēlētāja).\n\nJa jums ir problēma, apmeklējiet mūsu vietni \n\nhttps://padelshooter.com/ \nLejupielādes sadaļā Padelshooter 3A ir noderīga informācija problēmu atrašanai/risināšanai.\nPalīdzībai un atbalstam varat sazināties ar mums (vēlams whatsapp, nosūtot video) uz:\n\nDe Racketclub\nT: 31-630974299 (arī whatsapp)\n\nVai sazinieties ar savu izplatītāju.",
+  "version": "Versija",
+  "search": "Meklēt",
+  "search_programs": "Meklēt programmas",
+  "reset": "Atiestatīt"
 }
