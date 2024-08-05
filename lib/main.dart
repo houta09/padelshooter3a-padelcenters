@@ -13,10 +13,23 @@ import 'utils/bluetooth_manager.dart';
 import 'utils/app_localizations.dart';
 import 'dart:convert';
 
+late String settingsFileLink;
+late String programsFileLink;
+late String appTitle;
+
+Future<void> loadConfig(String model) async {
+  final configData = await rootBundle.loadString('assets/configurations/config_$model.json');
+  final config = json.decode(configData);
+
+  appTitle = config['appTitle'];
+  settingsFileLink = config['settingsFileLink'];
+  programsFileLink = config['programsFileLink'];
+}
+
 Future<void> _importSettingsFromWeb() async {
   print('*AVH-Import: Import from Web function called');
   try {
-    final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/training_settings_PS3A.json'));
+    final response = await http.get(Uri.parse(settingsFileLink));
 
     if (response.statusCode == 200) {
       print('*AVH-Import: Successfully fetched settings from web');
@@ -54,18 +67,14 @@ Future<void> _importSettingsFromWeb() async {
     print('*AVH-Import: Error importing settings from web: $e');
   }
 }
-/*
-Future<void> clearArabicLanguagePreference() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  if (prefs.getString('language_code') == 'ar') {
-    await prefs.remove('language_code');
-  }
-}
-*/
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-//  await clearArabicLanguagePreference();
+
+  // Load configuration based on the model
+  String model = '3a'; // Change this to 'smart' for PadelShooter Smart
+  await loadConfig(model);
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) async {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky); // Full-screen mode
@@ -134,7 +143,7 @@ class _PadelShooterAppState extends State<PadelShooterApp> {
           FocusScope.of(context).unfocus();
         },
         child: MaterialApp(
-          title: 'Padelshooter 3A',
+          title: appTitle, // Use the app title from the configuration
           home: const DynamicContentFrame(),
           locale: _locale,
           supportedLocales: const [
@@ -219,7 +228,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
   String _getPageTitle() {
     switch (_currentPageIndex) {
       case 0:
-        return AppLocalizations.of(context).translate('app_title') ?? 'Padelshooter 3A';
+        return AppLocalizations.of(context).translate('app_title') ?? appTitle;
       case 1:
         return AppLocalizations.of(context).translate('start_here') ?? 'Start Here';
       case 2:
@@ -259,7 +268,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
     print('*AVH-lang-m: Building DynamicContentFrame with page index: $_currentPageIndex');
 
     final String mainLabel = AppLocalizations.of(context).translate('main') ?? 'Main';
-    final String titleLabel = AppLocalizations.of(context).translate('app_title') ?? 'Padelshooter 3A';
+    final String titleLabel = AppLocalizations.of(context).translate('app_title') ?? appTitle;
     final String startHereLabel = AppLocalizations.of(context).translate('start_here') ?? 'Start Here';
     final String trainingsLabel = AppLocalizations.of(context).translate('trainings') ?? 'Trainings';
     final String programsLabel = AppLocalizations.of(context).translate('programs') ?? 'Programs';
@@ -340,7 +349,3 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
     );
   }
 }
-
-
-
-

@@ -1,0 +1,6 @@
+// config_smart.json
+{
+  "appTitle": "PadelShooter Smart",
+  "settingsFileLink": "https://padelshooter.com/wp-content/uploads/training_settings_SMART.json",
+  "programsFileLink": "https://padelshooter.com/wp-content/uploads/programs_SMART.json"
+}
