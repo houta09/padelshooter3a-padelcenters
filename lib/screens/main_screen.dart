@@ -23,7 +23,7 @@ class MainScreen extends StatelessWidget {
               children: <Widget>[
                 const SizedBox(height: 16),
                 Image.asset(
-                  'assets/images/PS3A-black_transp.png',
+                  'assets/images/Smart_black_ballshootingtr.png',
                   width: 200,
                   height: 200,
                   fit: BoxFit.contain,

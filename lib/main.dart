@@ -18,13 +18,21 @@ late String programsFileLink;
 late String appTitle;
 
 Future<void> loadConfig(String model) async {
-  final configData = await rootBundle.loadString('assets/configurations/config_$model.json');
-  final config = json.decode(configData);
+  print('*AVH-Config: Loading configuration for model: $model');
+  try {
+    final configData = await rootBundle.loadString('assets/configurations/config_$model.json');
+    final config = json.decode(configData);
 
-  appTitle = config['appTitle'];
-  settingsFileLink = config['settingsFileLink'];
-  programsFileLink = config['programsFileLink'];
+    appTitle = config['appTitle'];
+    settingsFileLink = config['settingsFileLink'];
+    programsFileLink = config['programsFileLink'];
+
+    print('*AVH-Config: Configuration loaded successfully');
+  } catch (e) {
+    print('*AVH-Config: Error loading configuration: $e');
+  }
 }
+
 
 Future<void> _importSettingsFromWeb() async {
   print('*AVH-Import: Import from Web function called');
@@ -69,10 +77,11 @@ Future<void> _importSettingsFromWeb() async {
 }
 
 void main() async {
+  print('*AVH-main: App starting...');
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load configuration based on the model
-  String model = '3a'; // Change this to 'smart' for PadelShooter Smart
+  String model = 'smart'; // Change this to 'smart' for PadelShooter Smart
   await loadConfig(model);
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
@@ -91,12 +100,14 @@ void main() async {
     print('*AVH-lang-m: Initial language code from preferences: $languageCode');
     // Check if settings have already been imported
     bool settingsImported = prefs.getBool('settings_imported') ?? false;
+    print('*AVH-main: Settings imported: $settingsImported');
     if (!settingsImported) {
       await _importSettingsFromWeb();
-      print('*AVH-import settings from Web');
+      print('*AVH-import: Settings imported from Web');
     }
 
     runApp(PadelShooterApp(initialLocale: Locale(languageCode)));
+    print('*AVH-main: runApp called');
   });
 }
 
@@ -203,6 +214,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
   @override
   void initState() {
     super.initState();
+    print('*AVH-DynamicContentFrame: Initializing with page index: $_currentPageIndex');
     final bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
     bluetoothManager.addListener(_updateConnectionStatus);
   }
@@ -211,10 +223,12 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
   void dispose() {
     final bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
     bluetoothManager.removeListener(_updateConnectionStatus);
+    print('*AVH-DynamicContentFrame: Disposing DynamicContentFrame');
     super.dispose();
   }
 
   void _updateConnectionStatus() {
+    print('*AVH-DynamicContentFrame: Bluetooth connection status changed');
     setState(() {});
   }
 
@@ -228,7 +242,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
   String _getPageTitle() {
     switch (_currentPageIndex) {
       case 0:
-        return AppLocalizations.of(context).translate('app_title') ?? appTitle;
+        return appTitle ?? "PadelShooter 3A";
       case 1:
         return AppLocalizations.of(context).translate('start_here') ?? 'Start Here';
       case 2:
@@ -243,6 +257,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
   }
 
   Widget _buildPage(Widget page) {
+    print('*AVH-DynamicContentFrame: Building page with title: ${_getPageTitle()}');
     return Column(
       children: [
         SafeArea(
@@ -265,7 +280,8 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
     final bluetoothManager = Provider.of<BluetoothManager>(context);
     final bool isConnected = bluetoothManager.isConnected;
 
-    print('*AVH-lang-m: Building DynamicContentFrame with page index: $_currentPageIndex');
+    print('*AVH-DynamicContentFrame: Building DynamicContentFrame with page index: $_currentPageIndex');
+    print('*AVH-DynamicContentFrame: Bluetooth connection status: ${isConnected ? 'Connected' : 'Disconnected'}');
 
     final String mainLabel = AppLocalizations.of(context).translate('main') ?? 'Main';
     final String titleLabel = AppLocalizations.of(context).translate('app_title') ?? appTitle;
@@ -274,7 +290,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
     final String programsLabel = AppLocalizations.of(context).translate('programs') ?? 'Programs';
     final String settingsLabel = AppLocalizations.of(context).translate('settings') ?? 'Settings';
 
-    print('*AVH-lang-m: Translations - Main: $mainLabel, Start Here: $startHereLabel, Trainings: $trainingsLabel, Programs: $programsLabel, Settings: $settingsLabel');
+    print('*AVH-DynamicContentFrame: Translations - Main: $mainLabel, Start Here: $startHereLabel, Trainings: $trainingsLabel, Programs: $programsLabel, Settings: $settingsLabel');
 
     return GestureDetector(
       onTap: () {
