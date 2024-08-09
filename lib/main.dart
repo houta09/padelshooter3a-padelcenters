@@ -33,7 +33,6 @@ Future<void> loadConfig(String model) async {
   }
 }
 
-
 Future<void> _importSettingsFromWeb() async {
   print('*AVH-Import: Import from Web function called');
   try {
@@ -81,7 +80,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load configuration based on the model
-  String model = 'smart'; // Change this to 'smart' for PadelShooter Smart
+  String model = '3a'; // Change this to '3a' for PadelShooter 3A
   await loadConfig(model);
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
@@ -261,16 +260,26 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
     return Column(
       children: [
         SafeArea(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            alignment: Alignment.center,
-            child: Text(
-              _getPageTitle(),
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          child: PreferredSize(
+            preferredSize: const Size.fromHeight(kToolbarHeight),
+            child: AppBar(
+              title: Text(
+                _getPageTitle(),
+                style: const TextStyle(color: Colors.white),
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
             ),
           ),
         ),
-        Expanded(child: page),
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.zero,
+            margin: EdgeInsets.zero,
+            child: page,
+          ),
+        ),
       ],
     );
   }
@@ -284,7 +293,6 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
     print('*AVH-DynamicContentFrame: Bluetooth connection status: ${isConnected ? 'Connected' : 'Disconnected'}');
 
     final String mainLabel = AppLocalizations.of(context).translate('main') ?? 'Main';
-    final String titleLabel = AppLocalizations.of(context).translate('app_title') ?? appTitle;
     final String startHereLabel = AppLocalizations.of(context).translate('start_here') ?? 'Start Here';
     final String trainingsLabel = AppLocalizations.of(context).translate('trainings') ?? 'Trainings';
     final String programsLabel = AppLocalizations.of(context).translate('programs') ?? 'Programs';

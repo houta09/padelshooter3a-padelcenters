@@ -14,7 +14,6 @@ class ProgramsScreen extends StatefulWidget {
 }
 
 class _ProgramsScreenState extends State<ProgramsScreen> {
-  // Initialize text editing controllers for various fields
   final List<Map<String, TextEditingController>> _shots = List.generate(
     20,
         (_) => {
@@ -31,42 +30,28 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   int _currentShotCount = 1;
-  int _selectedShotIndex = -1; // Index of the selected shot
+  int _selectedShotIndex = -1;
   String? _selectedCategory;
   List<String> _categories = [];
   List<Map<String, String>> _filteredPrograms = [];
   BluetoothManager? _bluetoothManager;
 
-  bool _isCategoryButtonPressed = false;
-  bool _isSaveButtonPressed = false;
-  bool _isLoadButtonPressed = false;
+  bool _isButtonPressed = false;
   bool _isPlayButtonPressed = false;
-  bool _isOffButtonPressed = false;
-  bool _isDeleteShotButtonPressed = false;
-  bool _isCopyShotButtonPressed = false;
-  bool _isMoveUpButtonPressed = false;
-  bool _isMoveDownButtonPressed = false;
   int _maxSpeed = 100;
 
   @override
   void initState() {
     super.initState();
     _bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
-    _loadModePreference();
-    _loadCategories();
+    _loadPreferences();
   }
 
-  Future<void> _loadModePreference() async {
+  Future<void> _loadPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String mode = prefs.getString('selected_mode') ?? 'Padel';
     setState(() {
       _maxSpeed = mode == 'Tennis' ? 250 : 100;
-    });
-  }
-
-  Future<void> _loadCategories() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
       _categories = prefs.getStringList('categories') ?? [];
     });
   }
@@ -87,8 +72,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
     List<String> programs = prefs.getStringList('programs_${_selectedCategory!}') ?? [];
+
     if (!programs.contains(_programNameController.text)) {
       programs.add(_programNameController.text);
       await prefs.setStringList('programs_${_selectedCategory!}', programs);
@@ -151,7 +136,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         int.parse(_shots[i]["Width"]!.text),
         int.parse(_shots[i]["Height"]!.text),
       ];
-      if (shot.any((value) => value != 0)) { // Only add shots with non-zero values
+      if (shot.any((value) => value != 0)) {
         program.add(shot);
       }
     }
@@ -193,7 +178,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       setState(() {
         _shots.removeAt(_selectedShotIndex);
         _currentShotCount--;
-        _selectedShotIndex = -1; // Reset selection
+        _selectedShotIndex = -1;
       });
       print('*AVH: Shot deleted at index: $_selectedShotIndex');
     }
@@ -368,15 +353,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
   void _resetButtonStates() {
     setState(() {
-      _isCategoryButtonPressed = false;
-      _isSaveButtonPressed = false;
-      _isLoadButtonPressed = false;
+      _isButtonPressed = false;
       _isPlayButtonPressed = false;
-      _isOffButtonPressed = false;
-      _isDeleteShotButtonPressed = false;
-      _isCopyShotButtonPressed = false;
-      _isMoveUpButtonPressed = false;
-      _isMoveDownButtonPressed = false;
     });
   }
 
@@ -434,12 +412,12 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-      },
-      child: Scaffold(
-        body: Stack(
+    return Scaffold(
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
           children: [
             Container(
               decoration: const BoxDecoration(
@@ -466,13 +444,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     onPressed: () {
                       _resetButtonStates();
                       setState(() {
-                        _isCategoryButtonPressed = true;
+                        _isButtonPressed = true;
                       });
                       _showCategoryList(context);
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: _isCategoryButtonPressed ? Colors.blue : Colors.grey[700],
+                      backgroundColor: _isButtonPressed ? Colors.blue : Colors.grey[700],
                       fixedSize: const Size(150, 40),
                     ),
                     child: Text(_selectedCategory ?? (AppLocalizations.of(context).translate('cat') ?? 'Category')),
@@ -584,8 +562,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                                   _shots[index][key]!.text = newValue.toString();
                                                 });
                                               }
-                                            } else {
-                                              // _saveSettings(index); // Removed this call
                                             }
                                             print('*AVH: Shot value updated for $key: $value');
                                           },
@@ -622,13 +598,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                         onPressed: () {
                           _resetButtonStates();
                           setState(() {
-                            _isSaveButtonPressed = true;
+                            _isButtonPressed = true;
                           });
                           _saveProgram();
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _isSaveButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _isButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
                         child: Text(AppLocalizations.of(context).translate('savep') ?? 'Save Program', style: const TextStyle(fontSize: 12)),
@@ -637,13 +613,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                         onPressed: () {
                           _resetButtonStates();
                           setState(() {
-                            _isLoadButtonPressed = true;
+                            _isButtonPressed = true;
                           });
                           _showProgramList(context);
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _isLoadButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _isButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
                         child: Text(AppLocalizations.of(context).translate('loadp') ?? 'Load Program', style: const TextStyle(fontSize: 12)),
@@ -673,14 +649,14 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                         onPressed: () {
                           _resetButtonStates();
                           setState(() {
-                            _isOffButtonPressed = true;
+                            _isButtonPressed = true;
                           });
                           _bluetoothManager?.sendCommandToPadelshooter(command: 0);
                           print('*AVH: Bluetooth command sent: Off');
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _isOffButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _isButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
                         child: Text(AppLocalizations.of(context).translate('off') ?? 'Off', style: const TextStyle(fontSize: 12)),
@@ -695,13 +671,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                         onPressed: _selectedShotIndex != -1 ? () {
                           _resetButtonStates();
                           setState(() {
-                            _isDeleteShotButtonPressed = true;
+                            _isButtonPressed = true;
                           });
                           _deleteShot();
                         } : null,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _selectedShotIndex != -1 && _isDeleteShotButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _selectedShotIndex != -1 && _isButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
                         child: Text(AppLocalizations.of(context).translate('delshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
@@ -710,13 +686,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                         onPressed: _selectedShotIndex != -1 ? () {
                           _resetButtonStates();
                           setState(() {
-                            _isCopyShotButtonPressed = true;
+                            _isButtonPressed = true;
                           });
                           _copyShot();
                         } : null,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _selectedShotIndex != -1 && _isCopyShotButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _selectedShotIndex != -1 && _isButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
                         child: Text(AppLocalizations.of(context).translate('copyshot') ?? 'Copy Shot', style: const TextStyle(fontSize: 12)),
@@ -731,13 +707,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                         onPressed: _selectedShotIndex > 0 ? () {
                           _resetButtonStates();
                           setState(() {
-                            _isMoveUpButtonPressed = true;
+                            _isButtonPressed = true;
                           });
                           _moveShotUp();
                         } : null,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _selectedShotIndex > 0 && _isMoveUpButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _selectedShotIndex > 0 && _isButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
                         child: Text(AppLocalizations.of(context).translate('mu') ?? 'Move Up', style: const TextStyle(fontSize: 12)),
@@ -746,13 +722,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                         onPressed: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 ? () {
                           _resetButtonStates();
                           setState(() {
-                            _isMoveDownButtonPressed = true;
+                            _isButtonPressed = true;
                           });
                           _moveShotDown();
                         } : null,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 && _isMoveDownButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 && _isButtonPressed ? Colors.blue : Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
                         child: Text(AppLocalizations.of(context).translate('md') ?? 'Move Down', style: const TextStyle(fontSize: 12)),

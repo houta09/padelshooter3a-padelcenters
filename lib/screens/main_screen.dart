@@ -5,7 +5,7 @@ import '../utils/app_localizations.dart';
 
 class MainScreen extends StatelessWidget {
   final Function(int) onNavigate;
-  final int nr = 16; // Initialize the build
+  final int nr = 16;
 
   const MainScreen({super.key, required this.onNavigate});
 
@@ -42,7 +42,7 @@ class MainScreen extends StatelessWidget {
                     style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ],
-                const SizedBox(height: 20), // Add some space before the version text
+                const SizedBox(height: 20),
                 Text(
                   '${AppLocalizations.of(context).translate('version') ?? 'Version'}: 0.1.0.$nr',
                   style: const TextStyle(fontSize: 16, color: Colors.white),

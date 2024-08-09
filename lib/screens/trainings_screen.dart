@@ -184,10 +184,10 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<BluetoothManager>(
-      builder: (context, bluetoothManager, child) {
-        return Scaffold(
-          body: Stack(
+    return Scaffold(
+      body: Consumer<BluetoothManager>(
+        builder: (context, bluetoothManager, child) {
+          return Stack(
             children: [
               Positioned.fill(
                 child: Image.asset(
@@ -216,9 +216,9 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                 ),
               ),
             ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

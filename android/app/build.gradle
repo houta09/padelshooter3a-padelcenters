@@ -51,7 +51,9 @@ android {
             if (!outputDir.exists()) {
                 outputDir.mkdirs()
             }
-            def newApkName = isSmartVersion ? "padelshooterSmart-${variant.buildType.name}.apk" : "padelshooter3a-${variant.buildType.name}.apk"
+//            def newApkName = isSmartVersion ? "padelshooterSmart-${variant.buildType.name}.apk" : "padelshooter3a-${variant.buildType.name}.apk"
+            def newApkName = isSmartVersion ? "padelshooterSmart.apk" : "padelshooter3a.apk"
+
             output.outputFileName = newApkName
         }
     }

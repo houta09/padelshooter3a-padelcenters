@@ -156,10 +156,10 @@ class _StartHereScreenState extends State<StartHereScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<BluetoothManager>(
-      builder: (context, bluetoothManager, child) {
-        return Scaffold(
-          body: Stack(
+    return Scaffold(
+      body: Consumer<BluetoothManager>(
+        builder: (context, bluetoothManager, child) {
+          return Stack(
             children: [
               Positioned.fill(
                 child: Image.asset(
@@ -167,29 +167,30 @@ class _StartHereScreenState extends State<StartHereScreen> {
                   fit: BoxFit.cover,
                 ),
               ),
+
               SafeArea(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            _buildCommandButtons(),
-                            _buildFieldSelectionButtons(),
-                            _buildValueControls(),
-                            _buildControlButtons(bluetoothManager),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                 child: Column(
+                   children: [
+                     Expanded(
+                       child: SingleChildScrollView(
+                         child: Column(
+                           mainAxisAlignment: MainAxisAlignment.start,
+                           children: [
+                             _buildCommandButtons(),
+                             _buildFieldSelectionButtons(),
+                             _buildValueControls(),
+                             _buildControlButtons(bluetoothManager),
+                           ],
+                         ),
+                       ),
+                     ),
+                   ],
+                 ),
+               ),
             ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
