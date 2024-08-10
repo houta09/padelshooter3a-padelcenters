@@ -1,3 +1,10 @@
+/*
+Difference to set between Smart and 3A
+- String model = '3a';
+- android/local.properties: isSmartVersion=false (3A)
+=
+ */
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';

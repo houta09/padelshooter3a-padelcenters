@@ -5,7 +5,7 @@ import '../utils/app_localizations.dart';
 
 class MainScreen extends StatelessWidget {
   final Function(int) onNavigate;
-  final int nr = 16;
+  final int nr = 18;
 
   const MainScreen({super.key, required this.onNavigate});
 
