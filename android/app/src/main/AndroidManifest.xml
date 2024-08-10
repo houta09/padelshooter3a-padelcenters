@@ -21,7 +21,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="padelshooter3a1"
+        android:label="Padelshooter 3A"
         android:icon="@mipmap/padelshooter_app"
         android:requestLegacyExternalStorage="true">
 
