@@ -506,7 +506,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _importSettingsFromWeb() async {
     print('*AVH-Import: Import Settings from Web button pressed');
     try {
-      final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/2024/07/training_settings.json'));
+      final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/training_settings_3a.json'));
 
       if (response.statusCode == 200) {
         print('*AVH-Import: Successfully fetched settings from web');
@@ -692,7 +692,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _importProgramsFromWeb() async {
     print('*AVH-Import: Import Programs from Web button pressed');
     try {
-      final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/programs_PS3A.json'));
+      final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/programs_3a.json'));
 
       if (response.statusCode == 200) {
         print('*AVH-Import: Successfully fetched programs from web');

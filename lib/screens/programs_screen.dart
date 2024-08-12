@@ -362,32 +362,54 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<Map<String, String>> allFilteredPrograms = [];
 
+    print('*AVH: _searchPrograms started.');
+
     if (_selectedCategory == null) {
+      print('*AVH: No category selected. Searching in all categories.');
+      print('*AVH: Categories available: $_categories');
+
       for (String category in _categories) {
         List<String> programs = prefs.getStringList('programs_$category') ?? [];
+        print('*AVH: Programs in category $category: $programs');
+
         if (_searchController.text.isEmpty) {
+          print('*AVH: Search text is empty. Adding all programs from $category.');
           allFilteredPrograms.addAll(programs.map((program) => {'category': category, 'program': program}));
         } else {
-          allFilteredPrograms.addAll(programs.where((program) => program.toLowerCase().contains(_searchController.text.toLowerCase())).map((program) => {'category': category, 'program': program}));
+          print('*AVH: Searching programs in $category containing: ${_searchController.text}');
+          allFilteredPrograms.addAll(
+              programs.where((program) => program.toLowerCase().contains(_searchController.text.toLowerCase()))
+                  .map((program) => {'category': category, 'program': program})
+          );
         }
       }
     } else {
+      print('*AVH: Searching in selected category: $_selectedCategory');
       List<String> programs = prefs.getStringList('programs_${_selectedCategory!}') ?? [];
+      print('*AVH: Programs in selected category $_selectedCategory: $programs');
+
       if (_searchController.text.isEmpty) {
+        print('*AVH: Search text is empty. Adding all programs from $_selectedCategory.');
         allFilteredPrograms = programs.map((program) => {'category': _selectedCategory!, 'program': program}).toList();
       } else {
-        allFilteredPrograms = programs.where((program) => program.toLowerCase().contains(_searchController.text.toLowerCase())).map((program) => {'category': _selectedCategory!, 'program': program}).toList();
+        print('*AVH: Searching programs in $_selectedCategory containing: ${_searchController.text}');
+        allFilteredPrograms = programs
+            .where((program) => program.toLowerCase().contains(_searchController.text.toLowerCase()))
+            .map((program) => {'category': _selectedCategory!, 'program': program})
+            .toList();
       }
     }
 
+    print('*AVH: Setting filtered programs and clearing shots.');
     setState(() {
       _filteredPrograms = allFilteredPrograms;
       _programNameController.clear();
       _clearShots();
     });
 
-    print('Programs filtered: $_filteredPrograms');
+    print('*AVH: Programs filtered: $_filteredPrograms');
   }
+
 
   void _resetFilters() {
     setState(() {
