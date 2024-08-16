@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_localizations.dart';
 import '../utils/bluetooth_manager.dart';
 
 class ProgramsScreen extends StatefulWidget {
   final Function(int) onNavigate;
+  final bool isDeveloperMode;
 
-  const ProgramsScreen({super.key, required this.onNavigate});
+  const ProgramsScreen({Key? key, required this.onNavigate, this.isDeveloperMode = false}) : super(key: key);
 
   @override
   _ProgramsScreenState createState() => _ProgramsScreenState();
@@ -35,38 +35,42 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   List<String> _categories = [];
   List<Map<String, String>> _filteredPrograms = [];
   BluetoothManager? _bluetoothManager;
-
-  bool _isButtonPressed = false;
-  bool _isPlayButtonPressed = false;
-  int _maxSpeed = 100;
+  bool _isDeveloperMode = false;
 
   @override
   void initState() {
     super.initState();
-    _bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
+    _bluetoothManager = BluetoothManager();
+    _isDeveloperMode = widget.isDeveloperMode;
     _loadPreferences();
   }
 
   Future<void> _loadPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String mode = prefs.getString('selected_mode') ?? 'Padel';
+
     setState(() {
-      _maxSpeed = mode == 'Tennis' ? 250 : 100;
+      _isDeveloperMode = prefs.getBool('developer_mode') ?? false;
       _categories = prefs.getStringList('categories') ?? [];
+      if (_isDeveloperMode) {
+        _categories.addAll(['SHL', 'SHR', 'TRL', 'TRR']);
+        print("*AVH: Found: developermode");
+      }
+      else print("*AVH: Found: not developermode");
     });
   }
 
   Future<void> _saveProgram() async {
     if (_programNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).translate('Please enter a name for the program.') ?? 'Please enter a name for the program.')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.translate('Please enter a name for the program.') ?? 'Please enter a name for the program.')),
       );
       return;
     }
 
     if (_selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).translate('Please select a category.') ?? 'Please select a category.')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.translate('Please select a category.') ?? 'Please select a category.')),
       );
       return;
     }
@@ -87,7 +91,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       prefs.setInt("${_selectedCategory!}_${_programNameController.text}_Height_$i", int.parse(_shots[i]["Height"]!.text));
     }
     prefs.setInt("${_selectedCategory!}_${_programNameController.text}_ShotCount", _currentShotCount);
-    print('*AVH: Program saved: ${_programNameController.text}');
   }
 
   Future<void> _loadProgram(String category, String programName) async {
@@ -105,7 +108,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       _shots[i]["Width"]!.text = (prefs.getInt("${category}_${programName}_Width_$i") ?? 0).toString();
       _shots[i]["Height"]!.text = (prefs.getInt("${category}_${programName}_Height_$i") ?? 0).toString();
     }
-    print('*AVH: Program loaded: $programName');
   }
 
   Future<void> _deleteProgram(String programName) async {
@@ -123,7 +125,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       await prefs.remove("${_selectedCategory!}_${programName}_Height_$i");
     }
     await prefs.remove("${_selectedCategory!}_${programName}_ShotCount");
-    print('*AVH: Program deleted: $programName');
   }
 
   Future<void> _playProgram() async {
@@ -145,7 +146,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     int maxSpeed = mode == 'Tennis' ? 250 : 100;
 
     await _bluetoothManager?.sendProgramToPadelshooter(program, maxSpeed);
-    print('*AVH: Program played: ${_programNameController.text}');
   }
 
   void _addShot() {
@@ -164,11 +164,10 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         setState(() {
           _currentShotCount++;
         });
-        print('*AVH: Shot added');
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).translate('Please fill in all fields for existing shots before adding a new one.') ?? 'Please fill in all fields for existing shots before adding a new one.')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.translate('Please fill in all fields for existing shots before adding a new one.') ?? 'Please fill in all fields for existing shots before adding a new one.')),
       );
     }
   }
@@ -180,7 +179,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         _currentShotCount--;
         _selectedShotIndex = -1;
       });
-      print('*AVH: Shot deleted at index: $_selectedShotIndex');
     }
   }
 
@@ -196,7 +194,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         });
         _currentShotCount++;
       });
-      print('*AVH: Shot copied at index: $_selectedShotIndex');
     }
   }
 
@@ -207,7 +204,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         _shots.insert(_selectedShotIndex - 1, shot);
         _selectedShotIndex--;
       });
-      print('*AVH: Shot moved up at index: $_selectedShotIndex');
     }
   }
 
@@ -218,19 +214,38 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         _shots.insert(_selectedShotIndex + 1, shot);
         _selectedShotIndex++;
       });
-      print('*AVH: Shot moved down at index: $_selectedShotIndex');
     }
   }
 
+  Future<void> _checkDeveloperModeStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isDeveloperMode = prefs.getBool('developer_mode') ?? false;
+  }
+
   Future<void> _showCategoryList(BuildContext context) async {
+    // Check and load developer mode status
+    await _checkDeveloperModeStatus();
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> categories = prefs.getStringList('categories') ?? [];
+
+// Ensure special categories are included
+    const List<String> specialCategories = ['SHL', 'SHR', 'TRL', 'TRR'];
+
+    if (_isDeveloperMode) {
+      // In developer mode, add the special categories if they're not already present
+      for (String specialCategory in specialCategories) {
+        if (!categories.contains(specialCategory)) {
+          categories.add(specialCategory);
+        }
+      }
+    }
 
     final category = await showDialog<String>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context).translate('Select Category') ?? 'Select Category'),
+          title: Text(AppLocalizations.of(context)?.translate('Select Category') ?? 'Select Category'),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
@@ -259,7 +274,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
             TextField(
               controller: _newCategoryController,
               decoration: InputDecoration(
-                hintText: AppLocalizations.of(context).translate('New Category') ?? 'New Category',
+                hintText: AppLocalizations.of(context)?.translate('New Category') ?? 'New Category',
               ),
             ),
             TextButton(
@@ -272,13 +287,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                   _showCategoryList(context);
                 }
               },
-              child: Text(AppLocalizations.of(context).translate('Add') ?? 'Add'),
+              child: Text(AppLocalizations.of(context)?.translate('Add') ?? 'Add'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text(AppLocalizations.of(context).translate('Cancel') ?? 'Cancel'),
+              child: Text(AppLocalizations.of(context)?.translate('Cancel') ?? 'Cancel'),
             ),
           ],
         );
@@ -290,25 +305,37 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         _selectedCategory = category;
         _searchPrograms();
       });
-      print('*AVH: Category selected: $_selectedCategory');
     }
   }
 
   Future<void> _showProgramList(BuildContext context) async {
     if (_selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).translate('Please select a category first.') ?? 'Please select a category first.')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.translate('Please select a category first.') ?? 'Please select a category first.')),
       );
       return;
     }
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Check and load developer mode status
+    await _checkDeveloperModeStatus();
+
+    // Check if the app is in developer mode
+    bool isDeveloperMode = prefs.getBool('developer_mode') ?? false;
+
+    // Get the list of programs for the selected category
     List<String> programs = prefs.getStringList('programs_${_selectedCategory!}') ?? [];
+
+    // If not in developer mode and the selected category is one of the special categories, clear the programs list
+    if (!isDeveloperMode && ['SHL', 'SHR', 'TRL', 'TRR'].contains(_selectedCategory)) {
+      programs = [];
+    }
 
     final programName = await showDialog<String>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context).translate('Load Program') ?? 'Load Program'),
+          title: Text(AppLocalizations.of(context)?.translate('Load Program') ?? 'Load Program'),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
@@ -339,7 +366,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text(AppLocalizations.of(context).translate('Cancel') ?? 'Cancel'),
+              child: Text(AppLocalizations.of(context)?.translate('Cancel') ?? 'Cancel'),
             ),
           ],
         );
@@ -351,32 +378,30 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     }
   }
 
-  void _resetButtonStates() {
-    setState(() {
-      _isButtonPressed = false;
-      _isPlayButtonPressed = false;
-    });
-  }
-
   Future<void> _searchPrograms() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Check and load developer mode status
+    await _checkDeveloperModeStatus();
+
     List<Map<String, String>> allFilteredPrograms = [];
 
-    print('*AVH: _searchPrograms started.');
+    // Check if the app is in developer mode
+    bool isDeveloperMode = prefs.getBool('developer_mode') ?? false;
+
+    // List of special categories
+    List<String> specialCategories = ['SHL', 'SHR', 'TRL', 'TRR'];
 
     if (_selectedCategory == null) {
-      print('*AVH: No category selected. Searching in all categories.');
-      print('*AVH: Categories available: $_categories');
-
       for (String category in _categories) {
-        List<String> programs = prefs.getStringList('programs_$category') ?? [];
-        print('*AVH: Programs in category $category: $programs');
+        // Skip special categories if not in developer mode
+        if (!isDeveloperMode && specialCategories.contains(category)) {
+          continue;
+        }
 
+        List<String> programs = prefs.getStringList('programs_$category') ?? [];
         if (_searchController.text.isEmpty) {
-          print('*AVH: Search text is empty. Adding all programs from $category.');
           allFilteredPrograms.addAll(programs.map((program) => {'category': category, 'program': program}));
         } else {
-          print('*AVH: Searching programs in $category containing: ${_searchController.text}');
           allFilteredPrograms.addAll(
               programs.where((program) => program.toLowerCase().contains(_searchController.text.toLowerCase()))
                   .map((program) => {'category': category, 'program': program})
@@ -384,15 +409,20 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         }
       }
     } else {
-      print('*AVH: Searching in selected category: $_selectedCategory');
-      List<String> programs = prefs.getStringList('programs_${_selectedCategory!}') ?? [];
-      print('*AVH: Programs in selected category $_selectedCategory: $programs');
+      // Skip special categories if not in developer mode and the selected category is one of them
+      if (!isDeveloperMode && specialCategories.contains(_selectedCategory!)) {
+        setState(() {
+          _filteredPrograms = [];
+          _programNameController.clear();
+          _clearShots();
+        });
+        return;
+      }
 
+      List<String> programs = prefs.getStringList('programs_${_selectedCategory!}') ?? [];
       if (_searchController.text.isEmpty) {
-        print('*AVH: Search text is empty. Adding all programs from $_selectedCategory.');
         allFilteredPrograms = programs.map((program) => {'category': _selectedCategory!, 'program': program}).toList();
       } else {
-        print('*AVH: Searching programs in $_selectedCategory containing: ${_searchController.text}');
         allFilteredPrograms = programs
             .where((program) => program.toLowerCase().contains(_searchController.text.toLowerCase()))
             .map((program) => {'category': _selectedCategory!, 'program': program})
@@ -400,14 +430,11 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       }
     }
 
-    print('*AVH: Setting filtered programs and clearing shots.');
     setState(() {
       _filteredPrograms = allFilteredPrograms;
       _programNameController.clear();
       _clearShots();
     });
-
-    print('*AVH: Programs filtered: $_filteredPrograms');
   }
 
 
@@ -457,32 +484,28 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     controller: _programNameController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context).translate('pn') ?? 'Program Name',
+                      labelText: AppLocalizations.of(context)?.translate('pn') ?? 'Program Name',
                       labelStyle: const TextStyle(color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {
-                      _resetButtonStates();
-                      setState(() {
-                        _isButtonPressed = true;
-                      });
                       _showCategoryList(context);
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: _isButtonPressed ? Colors.blue : Colors.grey[700],
+                      backgroundColor: Colors.grey[700],
                       fixedSize: const Size(150, 40),
                     ),
-                    child: Text(_selectedCategory ?? (AppLocalizations.of(context).translate('cat') ?? 'Category')),
+                    child: Text(_selectedCategory ?? (AppLocalizations.of(context)?.translate('cat') ?? 'Category')),
                   ),
                   const SizedBox(height: 20),
                   TextField(
                     controller: _searchController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context).translate('search_programs') ?? 'Search Programs',
+                      labelText: AppLocalizations.of(context)?.translate('search_programs') ?? 'Search Programs',
                       labelStyle: const TextStyle(color: Colors.white),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.search, color: Colors.white),
@@ -501,7 +524,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: Colors.blue,
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('search') ?? 'Search'),
+                        child: Text(AppLocalizations.of(context)?.translate('search') ?? 'Search'),
                       ),
                       ElevatedButton(
                         onPressed: _resetFilters,
@@ -510,7 +533,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('reset') ?? 'Reset'),
+                        child: Text(AppLocalizations.of(context)?.translate('reset') ?? 'Reset'),
                       ),
                     ],
                   ),
@@ -549,7 +572,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                 },
                               ),
                             ),
-                            Text('${AppLocalizations.of(context).translate('shot') ?? 'Shot'} ${index + 1}', style: const TextStyle(color: Colors.white, fontSize: 14)),
+                            Text('${AppLocalizations.of(context)?.translate('shot') ?? 'Shot'} ${index + 1}', style: const TextStyle(color: Colors.white, fontSize: 14)),
                             const SizedBox(width: 10),
                             ..._shots[index].keys.map((key) {
                               return Expanded(
@@ -557,7 +580,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
                                   child: Column(
                                     children: [
-                                      Text(AppLocalizations.of(context).translate(key.toLowerCase()) ?? key, style: const TextStyle(color: Colors.white, fontSize: 10)),
+                                      Text(AppLocalizations.of(context)?.translate(key.toLowerCase()) ?? key, style: const TextStyle(color: Colors.white, fontSize: 10)),
                                       SizedBox(
                                         width: 50,
                                         height: 30,
@@ -585,7 +608,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                                 });
                                               }
                                             }
-                                            print('*AVH: Shot value updated for $key: $value');
                                           },
                                         ),
                                       ),
@@ -609,7 +631,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           backgroundColor: Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('as') ?? 'Add Shot'),
+                        child: Text(AppLocalizations.of(context)?.translate('as') ?? 'Add Shot'),
                       ),
                     ),
                   const SizedBox(height: 20),
@@ -617,34 +639,24 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        onPressed: () {
-                          _resetButtonStates();
-                          setState(() {
-                            _isButtonPressed = true;
-                          });
-                          _saveProgram();
-                        },
+                        onPressed: _saveProgram,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _isButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('savep') ?? 'Save Program', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('savep') ?? 'Save Program', style: const TextStyle(fontSize: 12)),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          _resetButtonStates();
-                          setState(() {
-                            _isButtonPressed = true;
-                          });
                           _showProgramList(context);
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _isButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('loadp') ?? 'Load Program', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('loadp') ?? 'Load Program', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),
@@ -653,35 +665,24 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        onPressed: () {
-                          _resetButtonStates();
-                          setState(() {
-                            _isPlayButtonPressed = true;
-                          });
-                          _playProgram();
-                        },
+                        onPressed: _playProgram,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _isPlayButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('playprog') ?? 'Play Program', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('playprog') ?? 'Play Program', style: const TextStyle(fontSize: 12)),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          _resetButtonStates();
-                          setState(() {
-                            _isButtonPressed = true;
-                          });
                           _bluetoothManager?.sendCommandToPadelshooter(command: 0);
-                          print('*AVH: Bluetooth command sent: Off');
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _isButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: Colors.grey[700],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('off') ?? 'Off', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('off') ?? 'Off', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),
@@ -690,34 +691,22 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        onPressed: _selectedShotIndex != -1 ? () {
-                          _resetButtonStates();
-                          setState(() {
-                            _isButtonPressed = true;
-                          });
-                          _deleteShot();
-                        } : null,
+                        onPressed: _selectedShotIndex != -1 ? _deleteShot : null,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _selectedShotIndex != -1 && _isButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _selectedShotIndex != -1 ? Colors.grey[700] : Colors.grey[400],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('delshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('delshot') ?? 'Delete Shot', style: const TextStyle(fontSize: 12)),
                       ),
                       ElevatedButton(
-                        onPressed: _selectedShotIndex != -1 ? () {
-                          _resetButtonStates();
-                          setState(() {
-                            _isButtonPressed = true;
-                          });
-                          _copyShot();
-                        } : null,
+                        onPressed: _selectedShotIndex != -1 ? _copyShot : null,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _selectedShotIndex != -1 && _isButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _selectedShotIndex != -1 ? Colors.grey[700] : Colors.grey[400],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('copyshot') ?? 'Copy Shot', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('copyshot') ?? 'Copy Shot', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),
@@ -726,34 +715,22 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        onPressed: _selectedShotIndex > 0 ? () {
-                          _resetButtonStates();
-                          setState(() {
-                            _isButtonPressed = true;
-                          });
-                          _moveShotUp();
-                        } : null,
+                        onPressed: _selectedShotIndex > 0 ? _moveShotUp : null,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _selectedShotIndex > 0 && _isButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _selectedShotIndex > 0 ? Colors.grey[700] : Colors.grey[400],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('mu') ?? 'Move Up', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('mu') ?? 'Move Up', style: const TextStyle(fontSize: 12)),
                       ),
                       ElevatedButton(
-                        onPressed: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 ? () {
-                          _resetButtonStates();
-                          setState(() {
-                            _isButtonPressed = true;
-                          });
-                          _moveShotDown();
-                        } : null,
+                        onPressed: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 ? _moveShotDown : null,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 && _isButtonPressed ? Colors.blue : Colors.grey[700],
+                          backgroundColor: _selectedShotIndex != -1 && _selectedShotIndex < _currentShotCount - 1 ? Colors.grey[700] : Colors.grey[400],
                           fixedSize: const Size(150, 40),
                         ),
-                        child: Text(AppLocalizations.of(context).translate('md') ?? 'Move Down', style: const TextStyle(fontSize: 12)),
+                        child: Text(AppLocalizations.of(context)?.translate('md') ?? 'Move Down', style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),

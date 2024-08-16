@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 import 'dart:convert';
 import '../main.dart';
@@ -39,8 +38,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _isDeveloperMode = widget.developer;
   }
 
+  Future<void> _checkDeveloperModeStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isDeveloperMode = prefs.getBool('developer_mode') ?? false;
+  }
+
+
   Future<void> _loadPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Check and load developer mode status
+    await _checkDeveloperModeStatus();
+
     setState(() {
       _selectedLanguage = prefs.getString('language_code') ?? 'en';
       _selectedMode = prefs.getString('selected_mode') ?? 'Padel';
@@ -99,19 +108,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
     print('*AVH-settings: Speed factor set to: $value');
   }
 
+  Future<void> _setDeveloperMode(bool isDeveloper) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('developer_mode', isDeveloper);
+    setState(() {
+      _isDeveloperMode = isDeveloper;
+    });
+  }
+
   void _checkDeveloperPassword() {
     if (_passwordController.text == "padelisfun") {
-      setState(() {
-        _isDeveloperMode = true;
-      });
+      _setDeveloperMode(true);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Developer mode enabled')),
       );
     } else {
+      _setDeveloperMode(false); // Disable developer mode
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid password')),
+        const SnackBar(content: Text('Invalid password. Developer mode disabled.')),
       );
     }
+  }
+
+  void _gotoUserMode() async {
+    await _setDeveloperMode(false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Switched to User Mode')),
+    );
+    setState(() {
+      _isDeveloperMode = false;
+    });
   }
 
   Future<bool> _requestPermissions() async {
@@ -423,6 +449,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onChanged: (value) {
                     _setSpeedFactor(value.toInt());
                   },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _gotoUserMode,
+                  child: const Text('Goto User Mode'),
                 ),
               ],
               if (!_isDeveloperMode) ...[

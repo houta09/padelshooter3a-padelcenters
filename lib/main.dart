@@ -5,8 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'screens/main_screen.dart';
-import 'screens/start_here_screen.dart';
-import 'screens/trainings_screen.dart';
+import 'screens/start_here_screen_new.dart';
+import 'screens/trainings_screen_new.dart';
 import 'screens/programs_screen.dart';
 import 'screens/settings_screen.dart';
 import 'utils/bluetooth_manager.dart';
@@ -16,6 +16,7 @@ import 'dart:convert';
 late String settingsFileLink;
 late String programsFileLink;
 late String appTitle;
+late bool isDeveloperMode;
 
 void loadConfig(String model) {
   if (model == 'smart') {
@@ -79,6 +80,9 @@ Future<void> _importSettingsFromWeb() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  isDeveloperMode = prefs.getBool('developer_mode') ?? false;
+
   print('*AVH: Started');
 
   // Set model to 'smart' or '3a'
@@ -310,7 +314,7 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
                 _buildPage(StartHereScreen(onNavigate: changePage)),
                 _buildPage(TrainingsScreen(onNavigate: changePage)),
                 _buildPage(ProgramsScreen(onNavigate: changePage)),
-                _buildPage(SettingsScreen(onNavigate: changePage)),
+                _buildPage(SettingsScreen(onNavigate: changePage)), // Also pass to settings
               ],
             ),
           ],

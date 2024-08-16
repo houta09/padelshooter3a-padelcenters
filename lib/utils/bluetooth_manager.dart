@@ -169,15 +169,27 @@ class BluetoothManager extends ChangeNotifier {
 
   Future<void> sendProgramToPadelshooter(List<List<int>> program, int maxSpeed) async {
     List<int> intData = [11, maxSpeed, 0, 0, 100, _startSpeed, _speedFactor, 0];
+
+    print('*AVH: Initial data: $intData');
+
     for (var shot in program) {
       if (shot.any((value) => value != 0)) {
         shot[1] = convertSpinValue(shot[1]); // Convert spin value
         intData.addAll(shot);
         intData.add(254);
+        print('*AVH: Adding shot: $shot');
       }
     }
+
     intData.add(255);
-    await sendData(intData, serviceUUID, characteristicUUID);
+    print('*AVH: Final data to send: $intData');
+
+    try {
+      await sendData(intData, serviceUUID, characteristicUUID);
+      print('*AVH: Data sent successfully');
+    } catch (e) {
+      print('*AVH: Error sending data: $e');
+    }
   }
 
   @override
