@@ -34,6 +34,8 @@ class MainScreen extends StatelessWidget {
                     AppLocalizations.of(context).translate('connected_to_padelshooter') ?? "Connected to Padelshooter",
                     style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
+                  const SizedBox(height: 20),
+                  // Removed the Expanded ListView.builder for responses
                 ] else ...[
                   const CircularProgressIndicator(),
                   const SizedBox(height: 20),

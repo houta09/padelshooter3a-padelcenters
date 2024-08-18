@@ -41,8 +41,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _checkDeveloperModeStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _isDeveloperMode = prefs.getBool('developer_mode') ?? false;
+    setState(() {});
   }
-
 
   Future<void> _loadPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -593,11 +593,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Set<String> categories = prefs.getKeys().where((key) => key.startsWith('programs_')).map((key) => key.split('_')[1]).toSet();
 
     for (String category in categories) {
-      List<String> programs = prefs.getStringList('programs_$category') ?? [];
-      allPrograms[category] = {};
+      if (!_isDeveloperMode && (category == 'SHL' || category == 'SHR' || category == 'TRL' || category == 'TRR')) {
+        // Skip hidden categories if not in developer mode
+        continue;
+      }
 
+      List<String> programs = prefs.getStringList('programs_$category') ?? [];
+      if (programs.isEmpty) continue; // Skip empty categories
+
+      allPrograms[category] = {};
       for (String program in programs) {
         int shotCount = prefs.getInt('${category}_${program}_ShotCount') ?? 0;
+        if (shotCount == 0) continue; // Skip programs without shots
+
         allPrograms[category][program] = {"shotCount": shotCount, "shots": []};
 
         for (int i = 0; i < shotCount; i++) {
@@ -723,7 +731,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _importProgramsFromWeb() async {
     print('*AVH-Import: Import Programs from Web button pressed');
     try {
-      final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/programs_3a.json'));
+      final response = await http.get(Uri.parse('https://padelshooter.com/wp-content/uploads/programs_3a_Finnish.json'));
 
       if (response.statusCode == 200) {
         print('*AVH-Import: Successfully fetched programs from web');
@@ -793,11 +801,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       await _bluetoothManager.sendCommandToPadelshooter(
         command: 10,
-        speed: 14,
+        speed: 12,
         spin: 0,
         freq: 40,
         width: width,
-        height: 40,
+        height: 35,
         net: 0,
         generalInfo: 1,
         endByte: 255,

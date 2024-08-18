@@ -13,7 +13,7 @@ class StartHereScreen extends StatefulWidget {
   _StartHereScreenState createState() => _StartHereScreenState();
 }
 
-class _StartHereScreenState extends State<StartHereScreen> {
+class _StartHereScreenState extends State<StartHereScreen> with WidgetsBindingObserver {
   bool _isPlayActive = false;
   bool _leftSelected = true;
 
@@ -34,9 +34,29 @@ class _StartHereScreenState extends State<StartHereScreen> {
   void initState() {
     super.initState();
     _bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
+    WidgetsBinding.instance.addObserver(this);  // Adding observer to listen to app state changes
     _loadSettings();
     _loadPrograms();
     print('*AVH: StartHereScreen initialized');
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadPrograms();  // Reload programs when the app resumes
+    }
+  }
+
+  @override
+  void didUpdateWidget(StartHereScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _loadPrograms();  // Reload programs when the widget is updated
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);  // Removing observer
+    super.dispose();
   }
 
   Future<void> _loadSettings() async {
@@ -50,8 +70,12 @@ class _StartHereScreenState extends State<StartHereScreen> {
   void _updateFieldSelection() {
     setState(() {
       _leftSelected = !_leftSelected;
+      _loadPrograms().then((_) {
+        if (_selectedProgramIndex != -1) {
+          _loadShotsForProgram(_selectedProgramIndex);
+        }
+      });
     });
-    _loadPrograms();
     print('*AVH: Field selection updated: ${_leftSelected ? "Left" : "Right"}');
   }
 
@@ -66,7 +90,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
     });
 
     List<String> programs = prefs.getStringList('programs_$category') ?? [];
-    print("*AVH: Programs: $programs");
+
     for (String program in programs) {
       for (int i = 1; i <= 9; i++) {
         if (program.startsWith('$i-')) {
@@ -75,10 +99,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
           });
         }
       }
-      print("*AVH: Programs_inloop: $_programNames");
     }
-    print('*AVH: Programs loaded for category: $category');
-    print("*AVH: Programs_endloop: $_programNames");
   }
 
   Future<void> _loadShotsForProgram(int index) async {
@@ -201,7 +222,12 @@ class _StartHereScreenState extends State<StartHereScreen> {
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: _buildShotsList(),
+                          child: Column(
+                            children: [
+                              _buildShotsHeader(), // Add header here
+                              _buildShotsList(),
+                            ],
+                          ),
                         ),
                       ),
                     _buildFieldSelectionButton(),
@@ -219,8 +245,8 @@ class _StartHereScreenState extends State<StartHereScreen> {
   Widget _buildActionableButton(
       BuildContext context, int index, BluetoothManager bluetoothManager) {
     String image = _selectedProgramIndex == index
-        ? 'assets/images/Padelbaan_full_fixed_green.png'
-        : 'assets/images/Padelbaan_full_fixed.png';
+        ? 'assets/images/Padelbaan_full_green.png'
+        : 'assets/images/Padelbaan_full.png';
     String? programName = _programNames[index];
 
     return ElevatedButton(
@@ -246,10 +272,10 @@ class _StartHereScreenState extends State<StartHereScreen> {
           if (programName != null)
             Center(
               child: Text(
-                programName.split('-')[1],
+                programName.split('-')[1].replaceAll('+', '\n'),  // Split and format name
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 8, // Updated font size to 8
+                  fontSize: 10, // Updated font size to 10
                   fontWeight: FontWeight.bold,
                   shadows: [
                     Shadow(
@@ -267,8 +293,53 @@ class _StartHereScreenState extends State<StartHereScreen> {
     );
   }
 
+  Widget _buildShotsHeader() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(width: 40), // Add some space for alignment with shots
+        Expanded(
+          child: Text(
+            'Speed',
+            style: const TextStyle(color: Colors.white, fontSize: 10),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            'Spin',
+            style: const TextStyle(color: Colors.white, fontSize: 10),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            'Freq',
+            style: const TextStyle(color: Colors.white, fontSize: 10),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            'Width',
+            style: const TextStyle(color: Colors.white, fontSize: 10),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            'Height',
+            style: const TextStyle(color: Colors.white, fontSize: 10),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildShotsList() {
     return ListView.builder(
+      shrinkWrap: true,
       itemCount: _currentShotCount,
       itemBuilder: (context, index) {
         return Row(
@@ -289,6 +360,7 @@ class _StartHereScreenState extends State<StartHereScreen> {
                         ? const TextInputType.numberWithOptions(signed: true)
                         : TextInputType.number,
                     style: const TextStyle(color: Colors.white, fontSize: 10),
+                    textAlign: TextAlign.center, // Centering text in the field
                     decoration: const InputDecoration(
                       contentPadding:
                       EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),

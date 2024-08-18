@@ -55,9 +55,48 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       if (_isDeveloperMode) {
         _categories.addAll(['SHL', 'SHR', 'TRL', 'TRR']);
         print("*AVH: Found: developermode");
+      } else {
+        // Filter out special categories in user mode
+        _categories.removeWhere((category) => ['SHL', 'SHR', 'TRL', 'TRR'].contains(category));
+        print("*AVH: Found: not developermode");
       }
-      else print("*AVH: Found: not developermode");
     });
+  }
+
+  Future<void> _deleteCategory(String category) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Prevent deletion of special categories in user mode
+    if (!_isDeveloperMode && ['SHL', 'SHR', 'TRL', 'TRR'].contains(category)) {
+      return;
+    }
+
+    // Remove the category from the list of categories
+    List<String> categories = prefs.getStringList('categories') ?? [];
+    categories.remove(category);
+    await prefs.setStringList('categories', categories);
+
+    // Get the list of programs under this category
+    List<String> programs = prefs.getStringList('programs_$category') ?? [];
+
+    // Iterate through all programs in the category and delete associated data
+    for (String program in programs) {
+      int shotCount = prefs.getInt("${category}_${program}_ShotCount") ?? 0;
+      for (int i = 0; i < shotCount; i++) {
+        await prefs.remove("${category}_${program}_Speed_$i");
+        await prefs.remove("${category}_${program}_Spin_$i");
+        await prefs.remove("${category}_${program}_Freq_$i");
+        await prefs.remove("${category}_${program}_Width_$i");
+        await prefs.remove("${category}_${program}_Height_$i");
+      }
+      // Remove the ShotCount key itself
+      await prefs.remove("${category}_${program}_ShotCount");
+    }
+
+    // Finally, remove the list of programs for the deleted category
+    await prefs.remove('programs_$category');
+
+    print('*AVH: Category "$category" and all its programs deleted successfully.');
   }
 
   Future<void> _saveProgram() async {
@@ -112,19 +151,28 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
   Future<void> _deleteProgram(String programName) async {
     if (_selectedCategory == null) return;
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Remove program from the list of programs in the selected category
     List<String> programs = prefs.getStringList('programs_${_selectedCategory!}') ?? [];
     programs.remove(programName);
     await prefs.setStringList('programs_${_selectedCategory!}', programs);
 
-    for (int i = 0; i < _currentShotCount; i++) {
+    // Remove all related shots data for the program
+    int shotCount = prefs.getInt("${_selectedCategory!}_${programName}_ShotCount") ?? 0;
+    for (int i = 0; i < shotCount; i++) {
       await prefs.remove("${_selectedCategory!}_${programName}_Speed_$i");
       await prefs.remove("${_selectedCategory!}_${programName}_Spin_$i");
       await prefs.remove("${_selectedCategory!}_${programName}_Freq_$i");
       await prefs.remove("${_selectedCategory!}_${programName}_Width_$i");
       await prefs.remove("${_selectedCategory!}_${programName}_Height_$i");
     }
+
+    // Finally, remove the ShotCount key itself
     await prefs.remove("${_selectedCategory!}_${programName}_ShotCount");
+
+    print('*AVH: Program "$programName" from category "$_selectedCategory" deleted successfully.');
   }
 
   Future<void> _playProgram() async {
@@ -223,22 +271,21 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   }
 
   Future<void> _showCategoryList(BuildContext context) async {
-    // Check and load developer mode status
     await _checkDeveloperModeStatus();
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> categories = prefs.getStringList('categories') ?? [];
 
-// Ensure special categories are included
     const List<String> specialCategories = ['SHL', 'SHR', 'TRL', 'TRR'];
 
     if (_isDeveloperMode) {
-      // In developer mode, add the special categories if they're not already present
       for (String specialCategory in specialCategories) {
         if (!categories.contains(specialCategory)) {
           categories.add(specialCategory);
         }
       }
+    } else {
+      // Remove special categories from the list in user mode
+      categories.removeWhere((category) => specialCategories.contains(category));
     }
 
     final category = await showDialog<String>(
@@ -260,10 +307,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () async {
-                      categories.removeAt(index);
-                      await prefs.setStringList('categories', categories);
-                      Navigator.of(context).pop();
-                      _showCategoryList(context);
+                      if (_isDeveloperMode || !specialCategories.contains(categories[index])) {
+                        await _deleteCategory(categories[index]); // Delete the category and its data
+                        categories.removeAt(index);
+                        await prefs.setStringList('categories', categories);
+                        Navigator.of(context).pop();
+                        _showCategoryList(context);
+                      }
                     },
                   ),
                 );
@@ -350,11 +400,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () async {
-                      _deleteProgram(programs[index]);
-                      programs.removeAt(index);
-                      await prefs.setStringList('programs_${_selectedCategory!}', programs);
-                      Navigator.of(context).pop();
-                      _showProgramList(context);
+                      if (isDeveloperMode || !['SHL', 'SHR', 'TRL', 'TRR'].contains(_selectedCategory)) {
+                        _deleteProgram(programs[index]);
+                        programs.removeAt(index);
+                        await prefs.setStringList('programs_${_selectedCategory!}', programs);
+                        Navigator.of(context).pop();
+                        _showProgramList(context);
+                      }
                     },
                   ),
                 );
@@ -436,7 +488,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       _clearShots();
     });
   }
-
 
   void _resetFilters() {
     setState(() {
