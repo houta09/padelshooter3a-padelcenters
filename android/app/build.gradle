@@ -37,7 +37,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.padelshooter3a1"
+        applicationId "com.example.padelshooter3a1.padelcenter"
         minSdkVersion 21
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()

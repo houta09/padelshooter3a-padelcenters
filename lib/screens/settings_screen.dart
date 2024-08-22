@@ -29,6 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _selectedMode = 'Padel';
   final TextEditingController _passwordController = TextEditingController();
   bool _isDeveloperMode = false;
+  bool _isExtraMode = false; // New flag for extra mode
 
   @override
   void initState() {
@@ -108,16 +109,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     print('*AVH-settings: Speed factor set to: $value');
   }
 
-  Future<void> _setDeveloperMode(bool isDeveloper) async {
+  Future<void> _setDeveloperMode(bool isDeveloper, {bool isExtra = false}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('developer_mode', isDeveloper);
     setState(() {
       _isDeveloperMode = isDeveloper;
+      _isExtraMode = isExtra; // Set the extra mode flag
     });
   }
 
   void _checkDeveloperPassword() {
-    if (_passwordController.text == "padelisfun") {
+    if (_passwordController.text == "padelisfun-extra") {
+      _setDeveloperMode(true, isExtra: true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Developer mode (extra) enabled')),
+      );
+    } else if (_passwordController.text == "padelisfun") {
       _setDeveloperMode(true);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Developer mode enabled')),
@@ -137,6 +144,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     setState(() {
       _isDeveloperMode = false;
+      _isExtraMode = false; // Reset extra mode flag
     });
   }
 
@@ -421,35 +429,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
               if (_isDeveloperMode) ...[
-                const SizedBox(height: 20),
-                Text(
-                  'Start Speed',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
-                ),
-                Slider(
-                  value: _bluetoothManager.startSpeed.toDouble(),
-                  min: 0,
-                  max: 250,
-                  divisions: 250,
-                  label: _bluetoothManager.startSpeed.toString(),
-                  onChanged: (value) {
-                    _setStartSpeed(value.toInt());
-                  },
-                ),
-                Text(
-                  'Speed Factor',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
-                ),
-                Slider(
-                  value: _bluetoothManager.speedFactor.toDouble(),
-                  min: 0,
-                  max: 30,
-                  divisions: 30,
-                  label: _bluetoothManager.speedFactor.toString(),
-                  onChanged: (value) {
-                    _setSpeedFactor(value.toInt());
-                  },
-                ),
+                if (_isExtraMode) ...[
+                  const SizedBox(height: 20),
+                  Text(
+                    'Start Speed',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                  Slider(
+                    value: _bluetoothManager.startSpeed.toDouble(),
+                    min: 0,
+                    max: 250,
+                    divisions: 250,
+                    label: _bluetoothManager.startSpeed.toString(),
+                    onChanged: (value) {
+                      _setStartSpeed(value.toInt());
+                    },
+                  ),
+                  Text(
+                    'Speed Factor',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                  Slider(
+                    value: _bluetoothManager.speedFactor.toDouble(),
+                    min: 0,
+                    max: 30,
+                    divisions: 30,
+                    label: _bluetoothManager.speedFactor.toString(),
+                    onChanged: (value) {
+                      _setSpeedFactor(value.toInt());
+                    },
+                  ),
+                ],
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _gotoUserMode,
