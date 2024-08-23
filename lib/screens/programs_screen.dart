@@ -139,6 +139,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       _selectedCategory = category;
       _currentShotCount = shotCount;
       _programNameController.text = programName;
+      _filteredPrograms.clear(); // Clear the program list after loading a program
     });
     for (int i = 0; i < _currentShotCount; i++) {
       _shots[i]["Speed"]!.text = (prefs.getInt("${category}_${programName}_Speed_$i") ?? 0).toString();
@@ -152,27 +153,31 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   Future<void> _deleteProgram(String programName) async {
     if (_selectedCategory == null) return;
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool confirmed = await _showDeleteConfirmationDialog(programName);
 
-    // Remove program from the list of programs in the selected category
-    List<String> programs = prefs.getStringList('programs_${_selectedCategory!}') ?? [];
-    programs.remove(programName);
-    await prefs.setStringList('programs_${_selectedCategory!}', programs);
+    if (confirmed) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Remove all related shots data for the program
-    int shotCount = prefs.getInt("${_selectedCategory!}_${programName}_ShotCount") ?? 0;
-    for (int i = 0; i < shotCount; i++) {
-      await prefs.remove("${_selectedCategory!}_${programName}_Speed_$i");
-      await prefs.remove("${_selectedCategory!}_${programName}_Spin_$i");
-      await prefs.remove("${_selectedCategory!}_${programName}_Freq_$i");
-      await prefs.remove("${_selectedCategory!}_${programName}_Width_$i");
-      await prefs.remove("${_selectedCategory!}_${programName}_Height_$i");
+      // Remove program from the list of programs in the selected category
+      List<String> programs = prefs.getStringList('programs_${_selectedCategory!}') ?? [];
+      programs.remove(programName);
+      await prefs.setStringList('programs_${_selectedCategory!}', programs);
+
+      // Remove all related shots data for the program
+      int shotCount = prefs.getInt("${_selectedCategory!}_${programName}_ShotCount") ?? 0;
+      for (int i = 0; i < shotCount; i++) {
+        await prefs.remove("${_selectedCategory!}_${programName}_Speed_$i");
+        await prefs.remove("${_selectedCategory!}_${programName}_Spin_$i");
+        await prefs.remove("${_selectedCategory!}_${programName}_Freq_$i");
+        await prefs.remove("${_selectedCategory!}_${programName}_Width_$i");
+        await prefs.remove("${_selectedCategory!}_${programName}_Height_$i");
+      }
+
+      // Finally, remove the ShotCount key itself
+      await prefs.remove("${_selectedCategory!}_${programName}_ShotCount");
+
+      print('*AVH: Program "$programName" from category "$_selectedCategory" deleted successfully.');
     }
-
-    // Finally, remove the ShotCount key itself
-    await prefs.remove("${_selectedCategory!}_${programName}_ShotCount");
-
-    print('*AVH: Program "$programName" from category "$_selectedCategory" deleted successfully.');
   }
 
   Future<void> _playProgram() async {
@@ -487,6 +492,33 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       _programNameController.clear();
       _clearShots();
     });
+  }
+
+  Future<bool> _showDeleteConfirmationDialog(String programName) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)?.translate('Confirm Delete') ?? 'Confirm Delete'),
+          content: Text(AppLocalizations.of(context)?.translate('Are you sure you want to delete the program') ??
+              'Are you sure you want to delete the program "$programName"?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text(AppLocalizations.of(context)?.translate('Cancel') ?? 'Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text(AppLocalizations.of(context)?.translate('Delete') ?? 'Delete'),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
   }
 
   void _resetFilters() {
