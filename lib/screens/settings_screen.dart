@@ -27,9 +27,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _selectedLanguage;
   late BluetoothManager _bluetoothManager;
   String _selectedMode = 'Padel';
-  final TextEditingController _passwordController = TextEditingController();
   bool _isDeveloperMode = false;
   bool _isExtraMode = false; // New flag for extra mode
+
+  final TextEditingController _startSpeedController = TextEditingController();
+  final TextEditingController _speedFactorController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
@@ -42,6 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _checkDeveloperModeStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _isDeveloperMode = prefs.getBool('developer_mode') ?? false;
+    _isExtraMode = prefs.getBool('developer_mode_extra') ?? false; // Check for extra mode
     setState(() {});
   }
 
@@ -55,8 +59,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _selectedLanguage = prefs.getString('language_code') ?? 'en';
       _selectedMode = prefs.getString('selected_mode') ?? 'Padel';
       if (_isDeveloperMode) {
-        _bluetoothManager.startSpeed = prefs.getInt('startSpeed') ?? 50;
-        _bluetoothManager.speedFactor = prefs.getInt('speedFactor') ?? 5;
+        _bluetoothManager.startSpeed = prefs.getInt('startSpeed') ?? 60;
+        _bluetoothManager.speedFactor = prefs.getInt('speedFactor') ?? 6;
+        _startSpeedController.text = _bluetoothManager.startSpeed.toString();
+        _speedFactorController.text = _bluetoothManager.speedFactor.toString();
       }
     });
     print('*AVH-lang-s: Loaded language preference: $_selectedLanguage');
@@ -112,9 +118,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _setDeveloperMode(bool isDeveloper, {bool isExtra = false}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('developer_mode', isDeveloper);
+    await prefs.setBool('developer_mode_extra', isExtra); // Save extra mode flag
     setState(() {
       _isDeveloperMode = isDeveloper;
       _isExtraMode = isExtra; // Set the extra mode flag
+    });
+  }
+
+  void _gotoUserMode() async {
+    await _setDeveloperMode(false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Switched to User Mode')),
+    );
+    setState(() {
+      _isDeveloperMode = false;
+      _isExtraMode = false; // Reset extra mode flag
     });
   }
 
@@ -135,17 +153,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         const SnackBar(content: Text('Invalid password. Developer mode disabled.')),
       );
     }
-  }
-
-  void _gotoUserMode() async {
-    await _setDeveloperMode(false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Switched to User Mode')),
-    );
-    setState(() {
-      _isDeveloperMode = false;
-      _isExtraMode = false; // Reset extra mode flag
-    });
   }
 
   Future<bool> _requestPermissions() async {
@@ -435,28 +442,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     'Start Speed',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
                   ),
-                  Slider(
-                    value: _bluetoothManager.startSpeed.toDouble(),
-                    min: 0,
-                    max: 250,
-                    divisions: 250,
-                    label: _bluetoothManager.startSpeed.toString(),
+                  TextField(
+                    controller: _startSpeedController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Start Speed',
+                      border: const OutlineInputBorder(),
+                    ),
                     onChanged: (value) {
-                      _setStartSpeed(value.toInt());
+                      final parsedValue = int.tryParse(value);
+                      if (parsedValue != null) {
+                        _setStartSpeed(parsedValue);
+                      }
                     },
                   ),
+                  const SizedBox(height: 20),
                   Text(
                     'Speed Factor',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
                   ),
-                  Slider(
-                    value: _bluetoothManager.speedFactor.toDouble(),
-                    min: 0,
-                    max: 30,
-                    divisions: 30,
-                    label: _bluetoothManager.speedFactor.toString(),
+                  TextField(
+                    controller: _speedFactorController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Speed Factor',
+                      border: const OutlineInputBorder(),
+                    ),
                     onChanged: (value) {
-                      _setSpeedFactor(value.toInt());
+                      final parsedValue = int.tryParse(value);
+                      if (parsedValue != null) {
+                        _setSpeedFactor(parsedValue);
+                      }
                     },
                   ),
                 ],

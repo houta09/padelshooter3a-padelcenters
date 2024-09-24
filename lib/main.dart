@@ -284,13 +284,10 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
     print('*AVH-lang-m: Building DynamicContentFrame with page index: $_currentPageIndex');
 
     final String mainLabel = AppLocalizations.of(context).translate('main') ?? 'Main';
-    final String titleLabel = AppLocalizations.of(context).translate('app_title') ?? appTitle;
     final String startHereLabel = AppLocalizations.of(context).translate('start_here') ?? 'Start Here';
     final String trainingsLabel = AppLocalizations.of(context).translate('trainings') ?? 'Trainings';
     final String programsLabel = AppLocalizations.of(context).translate('programs') ?? 'Programs';
     final String settingsLabel = AppLocalizations.of(context).translate('settings') ?? 'Settings';
-
-    print('*AVH-lang-m: Translations - Main: $mainLabel, Start Here: $startHereLabel, Trainings: $trainingsLabel, Programs: $programsLabel, Settings: $settingsLabel');
 
     return GestureDetector(
       onTap: () {
@@ -311,10 +308,16 @@ class _DynamicContentFrameState extends State<DynamicContentFrame> {
               index: _currentPageIndex,
               children: [
                 _buildPage(MainScreen(onNavigate: changePage)),
-                _buildPage(StartHereScreen(onNavigate: changePage)),
-                _buildPage(TrainingsScreen(onNavigate: changePage)),
+                _buildPage(StartHereScreen(
+                  onNavigate: changePage,
+                  isDeveloperMode: isDeveloperMode,
+                )),
+                _buildPage(TrainingsScreen(
+                  onNavigate: changePage,
+                  isDeveloperMode: isDeveloperMode,
+                )),
                 _buildPage(ProgramsScreen(onNavigate: changePage)),
-                _buildPage(SettingsScreen(onNavigate: changePage)), // Also pass to settings
+                _buildPage(SettingsScreen(onNavigate: changePage)),
               ],
             ),
           ],

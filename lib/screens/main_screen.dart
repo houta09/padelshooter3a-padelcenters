@@ -5,9 +5,8 @@ import '../utils/app_localizations.dart';
 
 class MainScreen extends StatelessWidget {
   final Function(int) onNavigate;
-  final int nr = 18;
 
-  const MainScreen({super.key, required this.onNavigate});
+  MainScreen({super.key, required this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +34,6 @@ class MainScreen extends StatelessWidget {
                     style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                   const SizedBox(height: 20),
-                  // Removed the Expanded ListView.builder for responses
                 ] else ...[
                   const CircularProgressIndicator(),
                   const SizedBox(height: 20),
@@ -46,7 +44,7 @@ class MainScreen extends StatelessWidget {
                 ],
                 const SizedBox(height: 20),
                 Text(
-                  '${AppLocalizations.of(context).translate('version') ?? 'Version'}: 0.1.0.$nr',
+                  '${AppLocalizations.of(context).translate('version') ?? 'Version'}: 0.1.0.18',
                   style: const TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ],

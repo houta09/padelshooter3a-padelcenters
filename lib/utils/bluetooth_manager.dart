@@ -22,8 +22,8 @@ class BluetoothManager extends ChangeNotifier {
   static const String serviceUUID = "fff0";
   static const String characteristicUUID = "fff2";
 
-  int _startSpeed = 50;
-  int _speedFactor = 5;
+  int _startSpeed = 60;
+  int _speedFactor = 6;
 
   int get startSpeed => _startSpeed;
   int get speedFactor => _speedFactor;
@@ -35,6 +35,19 @@ class BluetoothManager extends ChangeNotifier {
 
   set speedFactor(int value) {
     _speedFactor = value;
+    notifyListeners();
+  }
+
+  // Add developer mode flags
+  bool _isDeveloperMode = false;
+  bool _isExtraMode = false;
+
+  bool get isDeveloperMode => _isDeveloperMode;
+  bool get isExtraMode => _isExtraMode;
+
+  void setDeveloperMode(bool isEnabled, {bool isExtraMode = false}) {
+    _isDeveloperMode = isEnabled;
+    _isExtraMode = isExtraMode;
     notifyListeners();
   }
 

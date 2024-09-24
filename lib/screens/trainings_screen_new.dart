@@ -6,8 +6,9 @@ import '../utils/bluetooth_manager.dart';
 
 class TrainingsScreen extends StatefulWidget {
   final Function(int) onNavigate;
+  final bool isDeveloperMode;
 
-  const TrainingsScreen({super.key, required this.onNavigate});
+  const TrainingsScreen({super.key, required this.onNavigate, this.isDeveloperMode = false});
 
   @override
   _TrainingsScreenState createState() => _TrainingsScreenState();
@@ -15,20 +16,23 @@ class TrainingsScreen extends StatefulWidget {
 
 class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingObserver {
   bool _isPlayActive = false;
+  bool _isPauseActive = false;
   bool _leftSelected = true;
 
   List<Map<String, TextEditingController>> _shots = [];
   final Map<int, String?> _programNames = {};
-  int _selectedProgramIndex = -1; // No training selected initially
+  int _selectedProgramIndex = -1;
   int _currentShotCount = 1;
   BluetoothManager? _bluetoothManager;
+
+  // Temporary session-based settings
+  Map<String, dynamic> sessionTrainingSettings = {};
 
   @override
   void initState() {
     super.initState();
     _bluetoothManager = Provider.of<BluetoothManager>(context, listen: false);
-    WidgetsBinding.instance.addObserver(this); // Adding observer to listen to app state changes
-    _loadSettings();
+    WidgetsBinding.instance.addObserver(this);
     _loadPrograms();
     print('*AVH: TrainingsScreen initialized');
   }
@@ -36,40 +40,21 @@ class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingOb
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _loadPrograms();  // Reload programs when the app resumes
+      _loadPrograms();
     }
   }
 
   @override
   void didUpdateWidget(TrainingsScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _loadPrograms();  // Reload programs when the widget is updated
+    _loadPrograms();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);  // Removing observer
+    WidgetsBinding.instance.removeObserver(this);
+    sessionTrainingSettings.clear(); // Clear session settings on exit
     super.dispose();
-  }
-
-  Future<void> _loadSettings() async {
-    // Load settings if required
-  }
-
-  Future<void> _saveSettings() async {
-    // Save settings if required
-  }
-
-  void _updateFieldSelection() {
-    setState(() {
-      _leftSelected = !_leftSelected;
-      _loadPrograms().then((_) {
-        if (_selectedProgramIndex != -1) {
-          _loadShotsForProgram(_selectedProgramIndex);
-        }
-      });
-    });
-    print('*AVH: Field selection updated: ${_leftSelected ? "Left" : "Right"}');
   }
 
   Future<void> _loadPrograms() async {
@@ -105,24 +90,81 @@ class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingOb
       setState(() {
         _shots = List.generate(
           _currentShotCount,
-              (_) => {
-            "Speed": TextEditingController(),
-            "Spin": TextEditingController(),
-            "Freq": TextEditingController(),
-            "Width": TextEditingController(),
-            "Height": TextEditingController(),
+              (i) => {
+            "Speed": TextEditingController(
+                text: (sessionTrainingSettings["${category}_${programName}_Speed_$i"] ??
+                    prefs.getInt("${category}_${programName}_Speed_$i") ??
+                    0)
+                    .toString()),
+            "Spin": TextEditingController(
+                text: (sessionTrainingSettings["${category}_${programName}_Spin_$i"] ??
+                    prefs.getInt("${category}_${programName}_Spin_$i") ??
+                    0)
+                    .toString()),
+            "Freq": TextEditingController(
+                text: (sessionTrainingSettings["${category}_${programName}_Freq_$i"] ??
+                    prefs.getInt("${category}_${programName}_Freq_$i") ??
+                    0)
+                    .toString()),
+            "Width": TextEditingController(
+                text: (sessionTrainingSettings["${category}_${programName}_Width_$i"] ??
+                    prefs.getInt("${category}_${programName}_Width_$i") ??
+                    0)
+                    .toString()),
+            "Height": TextEditingController(
+                text: (sessionTrainingSettings["${category}_${programName}_Height_$i"] ??
+                    prefs.getInt("${category}_${programName}_Height_$i") ??
+                    0)
+                    .toString()),
           },
         );
-
-        for (int i = 0; i < _currentShotCount; i++) {
-          _shots[i]["Speed"]!.text = (prefs.getInt("${category}_${programName}_Speed_$i") ?? 0).toString();
-          _shots[i]["Spin"]!.text = (prefs.getInt("${category}_${programName}_Spin_$i") ?? 0).toString();
-          _shots[i]["Freq"]!.text = (prefs.getInt("${category}_${programName}_Freq_$i") ?? 0).toString();
-          _shots[i]["Width"]!.text = (prefs.getInt("${category}_${programName}_Width_$i") ?? 0).toString();
-          _shots[i]["Height"]!.text = (prefs.getInt("${category}_${programName}_Height_$i") ?? 0).toString();
-        }
       });
     }
+  }
+
+  Future<void> _saveShotSettings(int index) async {
+    if (_selectedProgramIndex == -1) return;
+    final programName = _programNames[_selectedProgramIndex];
+    if (programName == null) return;
+
+    String category = _leftSelected ? "TRL" : "TRR";
+
+    // Store the settings in the session map instead of SharedPreferences
+    sessionTrainingSettings["${category}_${programName}_Speed_$index"] = int.parse(_shots[index]["Speed"]!.text);
+    sessionTrainingSettings["${category}_${programName}_Spin_$index"] = int.parse(_shots[index]["Spin"]!.text);
+    sessionTrainingSettings["${category}_${programName}_Freq_$index"] = int.parse(_shots[index]["Freq"]!.text);
+    sessionTrainingSettings["${category}_${programName}_Width_$index"] = int.parse(_shots[index]["Width"]!.text);
+    sessionTrainingSettings["${category}_${programName}_Height_$index"] = int.parse(_shots[index]["Height"]!.text);
+
+    print('*Temporary*: Settings for shot $index of program $programName saved temporarily.');
+  }
+
+  void _updateShotSettings(int index, String key, String value) {
+    setState(() {
+      _shots[index][key]!.text = value;
+    });
+    _saveShotSettings(index);
+  }
+
+  // This method is only for saving program data in developer mode
+  Future<void> _saveProgram() async {
+    if (_selectedProgramIndex == -1) return;
+    final programName = _programNames[_selectedProgramIndex];
+    if (programName == null) return;
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String category = _leftSelected ? "TRL" : "TRR";
+
+    for (int i = 0; i < _currentShotCount; i++) {
+      await prefs.setInt("${category}_${programName}_Speed_$i", int.parse(_shots[i]["Speed"]!.text));
+      await prefs.setInt("${category}_${programName}_Spin_$i", int.parse(_shots[i]["Spin"]!.text));
+      await prefs.setInt("${category}_${programName}_Freq_$i", int.parse(_shots[i]["Freq"]!.text));
+      await prefs.setInt("${category}_${programName}_Width_$i", int.parse(_shots[i]["Width"]!.text));
+      await prefs.setInt("${category}_${programName}_Height_$i", int.parse(_shots[i]["Height"]!.text));
+    }
+    await prefs.setInt("${category}_${programName}_ShotCount", _currentShotCount);
+
+    print('*AVH: Program $programName saved successfully by developer.');
   }
 
   void _sendProgramToPadelshooter(int index, BluetoothManager bluetoothManager) async {
@@ -166,15 +208,26 @@ class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingOb
     print('*AVH: Play button pressed');
     setState(() {
       _isPlayActive = true;
+      _isPauseActive = false;
     });
     _sendProgramToPadelshooter(_selectedProgramIndex, _bluetoothManager!);
+  }
+
+  void _handlePauseButtonPress() {
+    print('*AVH: Pause button pressed');
+    setState(() {
+      _isPlayActive = false;
+      _isPauseActive = true;
+    });
+    _bluetoothManager?.sendCommandToPadelshooter(command: 0); // Stop the shooter
   }
 
   void _handleOffButtonPress() async {
     print('*AVH: Off button pressed');
     setState(() {
       _isPlayActive = false;
-      _selectedProgramIndex = -1; // No training selected
+      _isPauseActive = false;
+      _selectedProgramIndex = -1;
     });
     try {
       await _bluetoothManager?.sendCommandToPadelshooter(command: 0);
@@ -190,6 +243,18 @@ class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingOb
       _loadShotsForProgram(index);
     });
     print('*AVH: Button $index pressed, program: ${_programNames[index]}');
+  }
+
+  void _updateFieldSelection() {
+    setState(() {
+      _leftSelected = !_leftSelected;
+      _loadPrograms().then((_) {
+        if (_selectedProgramIndex != -1) {
+          _loadShotsForProgram(_selectedProgramIndex);
+        }
+      });
+    });
+    print('*AVH: Field selection updated: ${_leftSelected ? "Left" : "Right"}');
   }
 
   @override
@@ -222,19 +287,40 @@ class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingOb
                         ),
                       ),
                     ),
-                    if (_selectedProgramIndex != -1) // Only show shots if a program is selected
+                    if (_selectedProgramIndex != -1)
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             children: [
-                              _buildShotsHeader(), // Add header here
+                              _buildShotsHeader(),
                               _buildShotsList(),
                             ],
                           ),
                         ),
                       ),
-                    _buildFieldSelectionButton(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (widget.isDeveloperMode)
+                          ElevatedButton(
+                            onPressed: _saveProgram, // Developer can save the program
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              backgroundColor: Colors.cyan,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text(
+                              'Save',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        _buildFieldSelectionButton(),
+                      ],
+                    ),
                     _buildControlButtons(bluetoothManager),
                   ],
                 ),
@@ -276,10 +362,10 @@ class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingOb
           if (programName != null)
             Center(
               child: Text(
-                programName.split('-')[1].replaceAll('+', '\n'),  // Split and format name
-                style: TextStyle(
+                programName.split('-')[1].replaceAll('+', '\n'),
+                style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 10, // Updated font size to 10
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
                   shadows: [
                     Shadow(
@@ -301,7 +387,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingOb
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(width: 40), // Add some space for alignment with shots
+        const SizedBox(width: 40),
         Expanded(
           child: Text(
             'Speed',
@@ -364,7 +450,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingOb
                         ? const TextInputType.numberWithOptions(signed: true)
                         : TextInputType.number,
                     style: const TextStyle(color: Colors.white, fontSize: 10),
-                    textAlign: TextAlign.center, // Centering text in the field
+                    textAlign: TextAlign.center,
                     decoration: const InputDecoration(
                       contentPadding:
                       EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
@@ -376,6 +462,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingOb
                         borderSide: BorderSide(color: Colors.white),
                       ),
                     ),
+                    onChanged: (value) => _updateShotSettings(index, key, value),
                   ),
                 ),
               );
@@ -414,9 +501,16 @@ class _TrainingsScreenState extends State<TrainingsScreen> with WidgetsBindingOb
           _buildButton(
             context,
             AppLocalizations.of(context).translate('off') ?? 'Off',
-            !_isPlayActive,
+            !_isPlayActive && !_isPauseActive,
             bluetoothManager,
             _handleOffButtonPress,
+          ),
+          _buildButton(
+            context,
+            AppLocalizations.of(context).translate('pause') ?? 'Pause',
+            _isPauseActive,
+            bluetoothManager,
+            _handlePauseButtonPress,
           ),
           _buildButton(
             context,
