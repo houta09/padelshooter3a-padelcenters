@@ -27,6 +27,10 @@ void loadConfig(String model) {
     appTitle = "PadelShooter 3A";
     settingsFileLink = "https://padelshooter.com/wp-content/uploads/training_settings_3a.json";
     programsFileLink = "https://padelshooter.com/wp-content/uploads/programs_3a.json";
+  } else if (model == '3b') {
+    appTitle = "PadelShooter 3B";
+    settingsFileLink = "https://padelshooter.com/wp-content/uploads/training_settings_3b_nw.json";
+    programsFileLink = "https://padelshooter.com/wp-content/uploads/programs_3a_Finnish.json";
   } else {
     throw Exception("Unknown model: $model");
   }
@@ -85,8 +89,8 @@ void main() async {
 
   print('*AVH: Started');
 
-  // Set model to 'smart' or '3a'
-  String model = '3a'; // Change this to '3a' for PadelShooter 3A
+  // Set model to 'smart' or '3a' or '3b'
+  String model = '3b'; // Change this to '3a' for PadelShooter 3A
 
   loadConfig(model);
 

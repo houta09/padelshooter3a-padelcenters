@@ -93,7 +93,7 @@ class BluetoothManager extends ChangeNotifier {
     StreamSubscription<List<ScanResult>>? scanSubscription;
 
     scanSubscription = FlutterBluePlus.scanResults.listen((results) {
-      var foundDevice = results.firstWhereOrNull((result) => result.device.name.toLowerCase() == "padelshooter");
+      var foundDevice = results.firstWhereOrNull((result) => result.device.name.toLowerCase().contains( "padelshooter"));
       if (foundDevice != null) {
         FlutterBluePlus.stopScan();
         isScanning = false;
@@ -102,7 +102,7 @@ class BluetoothManager extends ChangeNotifier {
       }
     });
 
-    FlutterBluePlus.startScan(timeout: const Duration(seconds: 20));
+    FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
     await completer.future.catchError((_) {});
     FlutterBluePlus.stopScan();
     isScanning = false;
@@ -169,7 +169,7 @@ class BluetoothManager extends ChangeNotifier {
     int height = 30,
     int training = 30,
     int net = 0,
-    int generalInfo = 1,
+    int generalInfo = 69,
     int endByte = 255,
   }) async {
     List<int> intData = [
@@ -181,7 +181,7 @@ class BluetoothManager extends ChangeNotifier {
   }
 
   Future<void> sendProgramToPadelshooter(List<List<int>> program, int maxSpeed) async {
-    List<int> intData = [11, maxSpeed, 0, 0, 100, _startSpeed, _speedFactor, 0];
+    List<int> intData = [11, maxSpeed, 0, 0, 100, _startSpeed, _speedFactor, 69];
 
     print('*AVH: Initial data: $intData');
 
